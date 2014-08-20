@@ -1,0 +1,6 @@
+      invoke  active_record
+      create    db/migrate/20140819080318_create_plans.rb
+      create    app/models/plans.rb
+      invoke    test_unit
+      create      test/models/plans_test.rb
+      create      test/fixtures/plans.yml
