@@ -1,9 +1,11 @@
 Rails.application.routes.draw do
 
-  get 'plan/index'
+  get 'plan' => 'plan#index'
 
   devise_for :users
   get '/' => "home#index"
+  get 'plan/:id' => "plan#index"
+  post 'plan/comment/:plan_id' => 'plan#comment'
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 

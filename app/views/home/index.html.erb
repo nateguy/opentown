@@ -1,27 +1,28 @@
 <h1>Home#index</h1>
 
 
-<div>
-  <% @plans.each do |plan| %>
-    <% polygon = plan.polygons %>
-      <% polygon.each do |vertix| %>
-          <li class="vertix" data-planid=<%=vertix.plan_id %> data-lat=<%= vertix.lat %> data-lng=<%= vertix.lng %> ></li>
-      <% end %>
+  <div class="mainpage">
+    <% @plans.each do |plan| %>
+      <% polygon = plan.polygons %>
+        <% polygon.each do |vertix| %>
 
-  <% end %>
+            <li class="vertix" data-planname="<%=plan.name %>" data-planid=<%=vertix.plan_id %> data-lat=<%= vertix.lat %> data-lng=<%= vertix.lng %> ></li>
+        <% end %>
+
+    <% end %>
+  </div>
 
 
-</div>
 
-<div id="panel">
-    <h2>Find a Location</h2>
-    <form class="map_address">
-    <input class="input-field" id="address" type="textbox" autofocus>
-    <button type="button" class="btn" id="btn_address">Find</button>
-    </form>
-</div>
-  <div id="map-canvas"/>
-</div>
+    <div id="panel">
+        <h2>Find a Location</h2>
+        <form class="map_address">
+        <input class="input-field" id="address" type="textbox" autofocus>
+        <button type="button" class="btn" id="btn_address">Find</button>
+        </form>
+    </div>
+    <div id="map-canvas"/>
+    </div>
 
 
 <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular.min.js"></script>
