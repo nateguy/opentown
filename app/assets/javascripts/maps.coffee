@@ -1,7 +1,15 @@
 geocoder = null
 map = null
 infoWindow = null
+
+                 #holds the map object drawn on the
+myDrawingManager = null      # holds drawing tools
+myField = null               # holds the polygon we draw using drawing tools
+myInfoWindow = null          #when our polygon is clicked, a dialog box
+centerpoint = null
 # overlay = null
+polygon = []
+PolygonCords = {}
 
 $ ->
 
@@ -12,8 +20,8 @@ $ ->
     geocoder = new google.maps.Geocoder()
 
     imageBounds = new google.maps.LatLngBounds(
-      new google.maps.LatLng(22.295116,113.9491722)
-      new google.maps.LatLng(22.3001587,113.9602229))
+      new google.maps.LatLng(22.294193,113.946973)
+      new google.maps.LatLng(22.305817,113.966819))
 
 
 
@@ -23,23 +31,10 @@ $ ->
       zoom: 8
 
 
-    polygon = []
-    PolygonCords = {}
-
     map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions)
 
-    newOverlay = new google.maps.GroundOverlay(
-      'plan/tungchung_cropped.jpg',
-      imageBounds)
-    newOverlay.setMap(map)
-  #define image overlay
-    # swBound = new google.maps.LatLng(22.295116,113.9491722)
-    # neBound = new google.maps.LatLng(22.3001587,113.9602229)
-    # bounds = new google.maps.LatLngBounds(swBound, neBound)
 
-    # srcImage = 'plan/tungchung_cropped.jpg'
-
-  #define polygons
+    # map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions)
 
 
     vertix = $(".vertix")
@@ -47,7 +42,6 @@ $ ->
     for i in vertix
       i = $(i)
       planid = i.data('planid')
-#fix this bug
       planname = i.data('planname')
       lat = i.data('lat')
       lng = i.data('lng')
@@ -63,6 +57,7 @@ $ ->
 
     for i of PolygonCords
       polygon[i] = new google.maps.Polygon
+        editable: true
         paths: PolygonCords[i],
         strokeColor: '#FF0000',
         fillColor: '#FF0000',
@@ -71,13 +66,97 @@ $ ->
         name: PolygonCords[i].name
 
       polygon[i].setMap(map)
-#      console.log showInfo
-
       google.maps.event.addListener(polygon[i], 'click', showInfo)
       infoWindow = new google.maps.InfoWindow()
 
-    # overlay = new PlanOverlay(bounds, srcImage, map)
+    # myInfoWindow = new google.maps.InfoWindow()
+    # DrawingTools()
+    planOverlay = new google.maps.GroundOverlay(
+      'plan/tungchung_cropped.jpg',
+      imageBounds)
+    planOverlay.setMap(map)
 
+  DrawingTools = ->
+    myDrawingManager = new google.maps.drawing.DrawingManager
+      drawingMode: null,
+      drawingControl: true,
+      drawingControlOptions:
+          position: google.maps.ControlPosition.TOP_RIGHT,
+          drawingModes: [
+              google.maps.drawing.OverlayType.POLYGON
+          ]
+      ,
+      polygonOptions:
+          draggable: true,
+          editable: true,
+          fillColor: '#cccccc',
+          fillOpacity: 0.5,
+          strokeColor: '#000000'
+
+    myDrawingManager.setMap(map)
+
+    FieldDrawingCompletionListener()
+
+
+
+  FieldDrawingCompletionListener = ->
+
+    google.maps.event.addListener(
+      myDrawingManager, 'polygoncomplete', (polygon) ->
+        myField = polygon
+        ShowDrawingTools(false)
+        PolygonEditable(false)
+        AddPropertyToField()
+        FieldClickListener()
+    )
+
+  ShowDrawingTools = (val) ->
+    myDrawingManager.setOptions
+        drawingMode: null,
+        drawingControl: val
+
+  AddPropertyToField = ->
+    obj =
+        'id':5,
+        'grower':'Joe',
+        'farm':'Dream Farm'
+    console.log myField
+    myField.objInfo = obj
+
+
+  FieldClickListener = ->
+    google.maps.event.addListener(
+      myField, 'click', (event) ->
+
+        message = GetMessage(myField)
+        myInfoWindow.setOptions({ content: message })
+        myInfoWindow.setPosition(event.latLng)
+        myInfoWindow.open(map)
+    )
+
+
+
+  GetMessage = (polygon) ->
+    coordinates = polygon.getPath().getArray()
+    message = ''
+
+    if typeof myField != undefined
+      message += '<h1 style="color:#000">Grower: ' + myField.objInfo.grower + '<br>' + 'Farm: ' + myField.objInfo.farm + '</h1>'
+
+    message += '<div style="color:#000">This polygon has ' + coordinates.length + '</div>'
+
+    coordinateMessage = '<p style="color:#000">My coordinates are:<br>'
+    for i in [0..(coordinates.length - 1)]
+      coordinateMessage += coordinates[i].lat() + ', ' + coordinates[i].lng() + '<br>'
+
+    coordinateMessage += '</p>'
+
+    message += '<p><button onclick=idFunction()>Edit</button> ' + '<a href="#" onclick="PolygonEditable(false)">Done</a> ' + '<a href="#" onclick="DeleteField(myField)">Delete</a></p>' + coordinateMessage
+
+    return message
+
+  showNewPoly = (event) ->
+    console.log "rectangle moved"
 
   showInfo = (event) ->
 
@@ -88,6 +167,7 @@ $ ->
     infoWindow.setContent("<a href='plan/#{this.id}'>#{this.name}</a>")
     infoWindow.setPosition(event.latLng)
     infoWindow.open(map)
+    console.log this.getPath().getArray()
 
 
   showArrays = (event) ->
@@ -101,6 +181,9 @@ $ ->
 
   # PlanOverlay.prototype = new google.maps.OverlayView()
   google.maps.event.addDomListener(window, 'load', initializeMap)
+
+
+
 
   $("#btn_address").click ->
     address = $("#address").val()
@@ -116,6 +199,17 @@ $ ->
                 position: results[0].geometry.location
         else
             alert "geocode not successful"
+
+  $("#print_polygon").click ->
+    alert "hey"
+    console.log polygon
+
+PolygonEditable = (val) ->
+    myField.setOptions
+        editable: val,
+        draggable: val
+    myInfoWindow.close()
+    return false
 
 #----start --- add on for image overlay
 

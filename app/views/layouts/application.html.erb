@@ -9,15 +9,22 @@
   <%= javascript_include_tag 'application', media: 'all' %>
   <%= csrf_meta_tags %>
   <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-  <script type="text/javascript"
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCxS8ZYJurRJ_RScZFxVvJ9nalD7IM0xQo">
-  </script>
+  <!-- <script type="text/javascript"
+  //     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCxS8ZYJurRJ_RScZFxVvJ9nalD7IM0xQo">
+  // </script> -->
+  <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=drawing,geometry"></script>
+  <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+  <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
 
 
 
 </head>
 <body>
-
+<script type="text/javascript">
+  idFunction = function(id) {
+    PolygonEditable(true);
+  };
+</script>
 
   <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
     <div class="container">
