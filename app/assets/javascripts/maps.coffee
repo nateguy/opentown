@@ -17,6 +17,8 @@ $ ->
   newOverlay = null
 
   initializeMap = ->
+
+
     geocoder = new google.maps.Geocoder()
 
     imageBounds = new google.maps.LatLngBounds(
@@ -28,7 +30,7 @@ $ ->
     latlng = new google.maps.LatLng(22.2670, 114.1880)
     mapOptions =
       center: latlng,
-      zoom: 8
+      zoom: 15
 
 
     map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions)
@@ -69,6 +71,7 @@ $ ->
       google.maps.event.addListener(polygon[i], 'click', showInfo)
       infoWindow = new google.maps.InfoWindow()
 
+
     # myInfoWindow = new google.maps.InfoWindow()
     # DrawingTools()
     planOverlay = new google.maps.GroundOverlay(
@@ -95,93 +98,99 @@ $ ->
 
     myDrawingManager.setMap(map)
 
-    FieldDrawingCompletionListener()
+    # FieldDrawingCompletionListener()
 
 
 
-  FieldDrawingCompletionListener = ->
+  # FieldDrawingCompletionListener = ->
 
-    google.maps.event.addListener(
-      myDrawingManager, 'polygoncomplete', (polygon) ->
-        myField = polygon
-        ShowDrawingTools(false)
-        PolygonEditable(false)
-        AddPropertyToField()
-        FieldClickListener()
-    )
+  #   google.maps.event.addListener(
+  #     myDrawingManager, 'polygoncomplete', (polygon) ->
+  #       myField = polygon
+  #       ShowDrawingTools(false)
+  #       PolygonEditable(false)
+  #       AddPropertyToField()
+  #       FieldClickListener()
+  #   )
 
-  ShowDrawingTools = (val) ->
-    myDrawingManager.setOptions
-        drawingMode: null,
-        drawingControl: val
+  # ShowDrawingTools = (val) ->
+  #   myDrawingManager.setOptions
+  #       drawingMode: null,
+  #       drawingControl: val
 
-  AddPropertyToField = ->
-    obj =
-        'id':5,
-        'grower':'Joe',
-        'farm':'Dream Farm'
-    console.log myField
-    myField.objInfo = obj
-
-
-  FieldClickListener = ->
-    google.maps.event.addListener(
-      myField, 'click', (event) ->
-
-        message = GetMessage(myField)
-        myInfoWindow.setOptions({ content: message })
-        myInfoWindow.setPosition(event.latLng)
-        myInfoWindow.open(map)
-    )
+  # AddPropertyToField = ->
+  #   obj =
+  #       'id':5,
+  #       'grower':'Joe',
+  #       'farm':'Dream Farm'
+  #   console.log myField
+  #   myField.objInfo = obj
 
 
+  # FieldClickListener = ->
+  #   google.maps.event.addListener(
+  #     myField, 'click', (event) ->
 
-  GetMessage = (polygon) ->
-    coordinates = polygon.getPath().getArray()
-    message = ''
+  #       message = GetMessage(myField)
+  #       myInfoWindow.setOptions({ content: message })
+  #       myInfoWindow.setPosition(event.latLng)
+  #       myInfoWindow.open(map)
+  #   )
 
-    if typeof myField != undefined
-      message += '<h1 style="color:#000">Grower: ' + myField.objInfo.grower + '<br>' + 'Farm: ' + myField.objInfo.farm + '</h1>'
 
-    message += '<div style="color:#000">This polygon has ' + coordinates.length + '</div>'
 
-    coordinateMessage = '<p style="color:#000">My coordinates are:<br>'
-    for i in [0..(coordinates.length - 1)]
-      coordinateMessage += coordinates[i].lat() + ', ' + coordinates[i].lng() + '<br>'
+  # GetMessage = (polygon) ->
+  #   coordinates = polygon.getPath().getArray()
+  #   message = ''
 
-    coordinateMessage += '</p>'
+  #   if typeof myField != undefined
+  #     message += '<h1 style="color:#000">Grower: ' + myField.objInfo.grower + '<br>' + 'Farm: ' + myField.objInfo.farm + '</h1>'
 
-    message += '<p><button onclick=idFunction()>Edit</button> ' + '<a href="#" onclick="PolygonEditable(false)">Done</a> ' + '<a href="#" onclick="DeleteField(myField)">Delete</a></p>' + coordinateMessage
+  #   message += '<div style="color:#000">This polygon has ' + coordinates.length + '</div>'
 
-    return message
+  #   coordinateMessage = '<p style="color:#000">My coordinates are:<br>'
+  #   for i in [0..(coordinates.length - 1)]
+  #     coordinateMessage += coordinates[i].lat() + ', ' + coordinates[i].lng() + '<br>'
+
+  #   coordinateMessage += '</p>'
+
+  #   message += '<p><button onclick=idFunction()>Edit</button> ' + '<a href="#" onclick="PolygonEditable(false)">Done</a> ' + '<a href="#" onclick="DeleteField(myField)">Delete</a></p>' + coordinateMessage
+
+  #   return message
 
   showNewPoly = (event) ->
     console.log "rectangle moved"
 
+
+
   showInfo = (event) ->
 
     # console.log event
+    id = this.id
+    name = this.name
+    paths = this.getPath().getArray()
 
+    google.maps.event.addListener(infoWindow, 'domready', ->
+      $('#modify').click ->
+        alert "hey"
+        console.log id
+        )
+    console.log paths
 
-
-    infoWindow.setContent("<a href='plan/#{this.id}'>#{this.name}</a>")
+    content = "<a href='plan/#{this.id}'>#{this.name}</a>"
+    content_end = "<br><form id='modifypolygon' action='plan/modifypolygon' method='post'>
+    <input type='hidden' name='id' value='#{id}'>
+    <input type='hidden' name='paths' value=' " + paths + " '><button>Submit</button><br>
+    <a id='modify'>Modify</a>"
+    infoWindow.setContent(content + content_end)
     infoWindow.setPosition(event.latLng)
     infoWindow.open(map)
-    console.log this.getPath().getArray()
 
 
-  showArrays = (event) ->
-    vertices = this.getPath()
-    console.log this
-    console.log event
-    contentstring = 'event.latLng.lat()'
-    infoWindow.setContent(contentstring)
-    infoWindow.setPosition(event.latLng)
-    infoWindow.open(map)
+
 
   # PlanOverlay.prototype = new google.maps.OverlayView()
   google.maps.event.addDomListener(window, 'load', initializeMap)
-
 
 
 

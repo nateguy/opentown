@@ -1,30 +1,38 @@
 
+        <% @plans.polygons.each do |vertix| %>
 
-<h1><%= @plan.name %></h1>
-<div class="row">
+            <li class="vertix" data-planname="<%=@plans.name %>" data-planid=<%=vertix.plan_id %> data-lat=<%= vertix.lat %> data-lng=<%= vertix.lng %> ></li>
+        <% end %>
 
-  <div class="col-md-9" id="planimage">
-    <img src='tungchung.jpg'>
-  </div>
-  <div class="col-md-3" id="messagelist">
+<div class="plan">
+  <h1><%= @plans.name %></h1>
+  <div id="map-canvas"/></div>
+  <div class="row">
 
-    <% @comments.each do |comment| %>
-      <div id="message" class="row">
-        <div class="row">
-          <%=@users.find(comment.user_id).email %>
-        </div>
-        <div class="row">
-          <%=comment.content %>
-        </div>
-      </div>
-    <% end %>
+    <div class="col-md-9" id="planimage">
 
-    <div class="row">
-      <form id="newcomment" action="/plan/comment/<%= @plan.id %>" method="post">
-        <input placeholder="comment" name="content" type="text">
-        <input type="submit" value"submit comment">
-      </form>
+      <img src='tungchung.jpg'>
     </div>
+    <div class="col-md-3" id="messagelist">
 
+      <% @comments.each do |comment| %>
+        <div id="message" class="row">
+          <div class="row">
+            <%=@users.find(comment.user_id).email %>
+          </div>
+          <div class="row">
+            <%=comment.content %>
+          </div>
+        </div>
+      <% end %>
+
+      <div class="row">
+        <form id="newcomment" action="/plan/comment/<%= @plans.id %>" method="post">
+          <input placeholder="comment" name="content" type="text">
+          <input type="submit" value"submit comment">
+        </form>
+      </div>
+
+    </div>
   </div>
 </div>

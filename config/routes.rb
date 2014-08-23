@@ -6,6 +6,7 @@ Rails.application.routes.draw do
   get '/' => "home#index"
   get 'plan/:id' => "plan#index"
   post 'plan/comment/:plan_id' => 'plan#comment'
+  post 'plan/modifypolygon' => 'plan#modifypolygon'
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
