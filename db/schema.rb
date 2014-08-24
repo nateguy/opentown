@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140822164029) do
+ActiveRecord::Schema.define(version: 20140824013644) do
 
   create_table "comments", force: true do |t|
     t.integer  "user_id"
@@ -29,8 +29,12 @@ ActiveRecord::Schema.define(version: 20140822164029) do
     t.datetime "updated_at"
   end
 
-# Could not dump table "polygons" because of following NoMethodError
-#   undefined method `[]' for nil:NilClass
+  create_table "polygons", force: true do |t|
+    t.integer  "plan_id"
+    t.string   "polygontype"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "users", force: true do |t|
     t.string   "email",                  default: "", null: false
@@ -49,5 +53,14 @@ ActiveRecord::Schema.define(version: 20140822164029) do
 
   add_index "users", ["email"], name: "index_users_on_email", unique: true
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+
+  create_table "vertices", force: true do |t|
+    t.integer  "polygon_id"
+    t.float    "lat"
+    t.float    "lng"
+    t.boolean  "todelete"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
 end

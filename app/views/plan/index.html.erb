@@ -1,8 +1,11 @@
+  <% polygons = @plans.polygons %>
+    <% polygons.each do |polygon| %>
+      <% polygon.vertices.each do |vertex| %>
+        <li class="vertex" data-planid=<%=@plans.id %> data-polygonid=<%= polygon.id %> data-lat=<%= vertex.lat %> data-lng=<%= vertex.lng %> ></li>
+      <% end %>
+    <% end %>
 
-        <% @plans.polygons.each do |vertix| %>
 
-            <li class="vertix" data-planname="<%=@plans.name %>" data-planid=<%=vertix.plan_id %> data-lat=<%= vertix.lat %> data-lng=<%= vertix.lng %> ></li>
-        <% end %>
 
 <div class="plan">
   <h1><%= @plans.name %></h1>

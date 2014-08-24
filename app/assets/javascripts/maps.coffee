@@ -39,25 +39,28 @@ $ ->
     # map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions)
 
 
-    vertix = $(".vertix")
+    vertix = $(".vertex")
 
     for i in vertix
       i = $(i)
       planid = i.data('planid')
+      polygonid = i.data('polygonid')
       planname = i.data('planname')
       lat = i.data('lat')
       lng = i.data('lng')
       console.log planid + " " + lat + " " + lng
 
-      if !(PolygonCords[planid])
-        PolygonCords[planid] = [new google.maps.LatLng(lat, lng)]
-        PolygonCords[planid].name = i.data('planname')
+      if !(PolygonCords[polygonid])
+        PolygonCords[polygonid] = [new google.maps.LatLng(lat, lng)]
+        PolygonCords[polygonid].name = i.data('planname')
+        PolygonCords[polygonid].planid = i.data('planid')
       else
-        PolygonCords[planid].push new google.maps.LatLng(lat, lng)
+        PolygonCords[polygonid].push new google.maps.LatLng(lat, lng)
       #polygonCords.push new google.maps.LatLng(lat, lng)
 
-
+    console.log PolygonCords
     for i of PolygonCords
+      console.log i
       polygon[i] = new google.maps.Polygon
         editable: true
         paths: PolygonCords[i],
@@ -65,6 +68,7 @@ $ ->
         fillColor: '#FF0000',
         fillOpacity: 0.5,
         id: i,
+        planid: PolygonCords[i].planid,
         name: PolygonCords[i].name
 
       polygon[i].setMap(map)
@@ -166,8 +170,11 @@ $ ->
   showInfo = (event) ->
 
     # console.log event
+    console.log this.id
     id = this.id
+    planid = this.planid
     name = this.name
+
     paths = this.getPath().getArray()
 
     google.maps.event.addListener(infoWindow, 'domready', ->
@@ -177,7 +184,7 @@ $ ->
         )
     console.log paths
 
-    content = "<a href='plan/#{this.id}'>#{this.name}</a>"
+    content = "<a href='plan/#{planid}'>#{name}</a> #{id}"
     content_end = "<br><form id='modifypolygon' action='plan/modifypolygon' method='post'>
     <input type='hidden' name='id' value='#{id}'>
     <input type='hidden' name='paths' value=' " + paths + " '><button>Submit</button><br>
@@ -186,7 +193,31 @@ $ ->
     infoWindow.setPosition(event.latLng)
     infoWindow.open(map)
 
+  showZoneInfo = (event) ->
 
+    # console.log event
+    console.log "id of this is: " + this.id
+    id = this.id
+    planid = this.planid
+    name = this.name
+
+    paths = this.getPath().getArray()
+
+    google.maps.event.addListener(infoWindow, 'domready', ->
+      $('#modify').click ->
+        alert "hey"
+        console.log id
+        )
+    console.log paths
+
+    content = "<a href='plan/#{planid}'>#{name}</a>"
+    content_end = "<br><form id='modifypolygon' action='plan/modifypolygon' method='post'>
+    <input type='hidden' name='id' value='#{id}'>
+    <input type='hidden' name='paths' value=' " + paths + " '><button>Submit</button><br>
+    <a id='modify'>Modify</a>"
+    infoWindow.setContent(content + content_end)
+    infoWindow.setPosition(event.latLng)
+    infoWindow.open(map)
 
 
   # PlanOverlay.prototype = new google.maps.OverlayView()

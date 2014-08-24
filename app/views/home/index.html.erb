@@ -5,10 +5,11 @@
 
   <div class="mainpage">
     <% @plans.each do |plan| %>
-      <% polygon = plan.polygons %>
-        <% polygon.each do |vertix| %>
+      <% polygon = plan.polygons.find_by(polygontype: "planmap") %>
+      <% vertices = polygon.vertices %>
+        <% vertices.each do |vertex| %>
 
-            <li class="vertix" data-planname="<%=plan.name %>" data-planid=<%=vertix.plan_id %> data-lat=<%= vertix.lat %> data-lng=<%= vertix.lng %> ></li>
+            <li class="vertex" data-planname="<%=plan.name %>" data-planid=<%=polygon.plan_id %> data-polygonid=<%= polygon.id %> data-lat=<%= vertex.lat %> data-lng=<%= vertex.lng %> ></li>
         <% end %>
 
     <% end %>

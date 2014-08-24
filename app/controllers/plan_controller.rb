@@ -14,10 +14,11 @@ class PlanController < ApplicationController
     id = params[:id]
     paths = params[:paths]
 
-    paths = paths.split("),(")
-    @paths = paths[1..(paths.length-2)]
-
-    oldpolygons = Polygon.where("plan_id == #{id}")
+    paths = paths.strip
+    paths = paths[1..paths.length - 2]
+    @paths = paths.split("),(")
+    # puts @paths
+    oldpolygons = Vertex.where(polygon_id: id)
 
     oldpolygons.each do |oldpolygon|
       oldpolygon.todelete = true
@@ -27,16 +28,9 @@ class PlanController < ApplicationController
     @paths.each do |cord|
       cord = cord.split(", ")
 
-      Polygon.create(plan_id: id, lat: cord[0], lng: cord[1], todelete: false)
+      Vertex.create(polygon_id: id, lat: cord[0], lng: cord[1], todelete: false)
 
     end
-
-    oldpolygons = Polygon.where(todelete: true)
-    oldpolygons.delete_all
-    #oldpolygons.delete_all
-    # @paths = path.split("),(")
-    # @paths = path.gsub!("(","\n")
-    # @paths = path.gsub!(")","\n")
 
 
 
