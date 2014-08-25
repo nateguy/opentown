@@ -5,9 +5,15 @@ class PlanController < ApplicationController
 
     plan_id = params[:id]
     @plans = Plan.find(plan_id)
-    @comments = Plan.find(plan_id).comments
-    @users = User.all
 
+    @users = User.all
+    @zones = Zone.all
+
+  end
+
+  def comments
+    plan_id = params[:id]
+    @comments = Plan.find(plan_id).comments
   end
 
   def modifypolygon

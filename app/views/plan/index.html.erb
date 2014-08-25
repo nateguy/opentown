@@ -1,41 +1,38 @@
+
+
   <% polygons = @plans.polygons %>
     <% polygons.each do |polygon| %>
       <% polygon.vertices.each do |vertex| %>
-        <li class="vertex" data-planid=<%=@plans.id %> data-polygonid=<%= polygon.id %> data-lat=<%= vertex.lat %> data-lng=<%= vertex.lng %> ></li>
+        <li class="vertex" data-planid=<%=@plans.id %> data-zoneid=<%= polygon.zone_id %> data-polygonid=<%= polygon.id %> data-lat=<%= vertex.lat %> data-lng=<%= vertex.lng %> ></li>
       <% end %>
     <% end %>
 
 
 
 <div class="plan">
-  <h1><%= @plans.name %></h1>
-  <div id="map-canvas"/></div>
   <div class="row">
-
-    <div class="col-md-9" id="planimage">
-
-      <img src='tungchung.jpg'>
-    </div>
-    <div class="col-md-3" id="messagelist">
-
-      <% @comments.each do |comment| %>
-        <div id="message" class="row">
-          <div class="row">
-            <%=@users.find(comment.user_id).email %>
-          </div>
-          <div class="row">
-            <%=comment.content %>
-          </div>
-        </div>
-      <% end %>
-
-      <div class="row">
-        <form id="newcomment" action="/plan/comment/<%= @plans.id %>" method="post">
-          <input placeholder="comment" name="content" type="text">
-          <input type="submit" value"submit comment">
-        </form>
-      </div>
+    <div class="heading clearfix">
+      <h1 id="plan-name"><%= @plans.name %></h1>
+      <div class="userplan"><a class="btn-glow">Add Comment</a></div>
+      <div class="userplan"><a class="btn-glow">Create Custom Plan</a></div>
 
     </div>
   </div>
+  <div class="span12 case-menu">
+    <div class="btn-group">
+      <a class="btn btn-default">Outline Development Plan</a>
+      <a class="btn btn-default">Background</a>
+      <a class="btn btn-default">Comments</a>
+    </div>
+  </div>
+  <div class="row">
+
+    <div id="map-canvas"/></div>
+  </div>
+  <div class="row">
+    <% @zones.each do |zone| %>
+        <li class="zone" data-id=<%= zone.id %> data-code=<%= zone.code %> data-color=<%= zone.color_code %> > <div class="legendbox" style="background-color:<%= zone.color_code %>"></div><%= zone.code %> </li>
+    <% end %>
+  </div>
+
 </div>

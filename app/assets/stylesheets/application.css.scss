@@ -25,10 +25,64 @@ html, body {
 
 body {
   padding-top: 50px;
-  margin: 0;
+  margin: 10px;
 
 }
 
-.vertex {
+h1 {
+  font-size: 25px;
+
+}
+
+.plan .heading {
+  margin-bottom: 20px;
+  display: block;
+}
+
+#plan-name {
+  float: left;
+  margin-top: 5px;
+  color: #880000;
+  margin-right: 10px;
+}
+
+.span12.case-menu {
+  margin-bottom: 10px;
+}
+
+.btn-glow {
+  background-color: #880000;
+  padding: 10px 10px;
+
+  color: #ffffff;
+}
+
+.userplan {
+
+  float: left;
+  position: relative;
+  display: block;
+
+  margin: 10px 5px;
+}
+
+.btn-glow:hover {
+  background-color: #440000;
+  color: #ffffff;
+
+}
+
+.legendbox {
+  width: 20px;
+  height: 20px;
+  float: left;
+}
+
+li.vertex {
   display: none;
+}
+
+.row {
+  margin-left: 10px;
+  margin-right: 10px;
 }

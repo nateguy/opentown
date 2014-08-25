@@ -54,18 +54,33 @@ $ ->
         PolygonCords[polygonid] = [new google.maps.LatLng(lat, lng)]
         PolygonCords[polygonid].name = i.data('planname')
         PolygonCords[polygonid].planid = i.data('planid')
+        PolygonCords[polygonid].zoneid = i.data('zoneid')
       else
         PolygonCords[polygonid].push new google.maps.LatLng(lat, lng)
       #polygonCords.push new google.maps.LatLng(lat, lng)
+    console.log "PolygonCords"
 
-    console.log PolygonCords
+    zones = {}
+
+    for c in $(".zone")
+      c = $(c)
+
+      id = c.data('id')
+      console.log id
+      if !(zones[id])
+        zones[id] = {code: c.data('code'), color: c.data('color')}
+
+
+    console.log zones[1]
     for i of PolygonCords
-      console.log i
+      console.log PolygonCords
+      zoneid = PolygonCords[i].zoneid
+      console.log zones[zoneid].color
       polygon[i] = new google.maps.Polygon
-        editable: true
+        editable: false
         paths: PolygonCords[i],
         strokeColor: '#FF0000',
-        fillColor: '#FF0000',
+        fillColor: zones[zoneid].color,
         fillOpacity: 0.5,
         id: i,
         planid: PolygonCords[i].planid,
