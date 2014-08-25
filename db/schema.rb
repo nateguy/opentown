@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140824013644) do
+ActiveRecord::Schema.define(version: 20140825023119) do
 
   create_table "comments", force: true do |t|
     t.integer  "user_id"
@@ -34,6 +34,7 @@ ActiveRecord::Schema.define(version: 20140824013644) do
     t.string   "polygontype"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "zone_id"
   end
 
   create_table "users", force: true do |t|
@@ -61,6 +62,15 @@ ActiveRecord::Schema.define(version: 20140824013644) do
     t.boolean  "todelete"
     t.datetime "created_at"
     t.datetime "updated_at"
+  end
+
+  create_table "zones", force: true do |t|
+    t.string   "code"
+    t.string   "description"
+    t.string   "classification"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "color_code"
   end
 
 end
