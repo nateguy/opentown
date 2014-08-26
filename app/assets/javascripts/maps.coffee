@@ -9,7 +9,7 @@ myInfoWindow = null          #when our polygon is clicked, a dialog box
 centerpoint = null
 # overlay = null
 polygon = []
-PolygonCords = {}
+polygonVertices = {}
 
 $ ->
 
@@ -27,7 +27,7 @@ $ ->
 
 
 
-    latlng = new google.maps.LatLng(22.2670, 114.1880)
+    latlng = new google.maps.LatLng(22.297256, 113.948430)
     mapOptions =
       center: latlng,
       zoom: 15
@@ -38,7 +38,7 @@ $ ->
 
     # map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions)
 
-
+    #Create polygon vertices
     vertix = $(".vertex")
 
     for i in vertix
@@ -50,16 +50,17 @@ $ ->
       lng = i.data('lng')
       console.log planid + " " + lat + " " + lng
 
-      if !(PolygonCords[polygonid])
-        PolygonCords[polygonid] = [new google.maps.LatLng(lat, lng)]
-        PolygonCords[polygonid].name = i.data('planname')
-        PolygonCords[polygonid].planid = i.data('planid')
-        PolygonCords[polygonid].zoneid = i.data('zoneid')
+      if !(polygonVertices[polygonid])
+        polygonVertices[polygonid] = [new google.maps.LatLng(lat, lng)]
+        polygonVertices[polygonid].name = i.data('planname')
+        polygonVertices[polygonid].planid = i.data('planid')
+        polygonVertices[polygonid].zoneid = i.data('zoneid')
       else
-        PolygonCords[polygonid].push new google.maps.LatLng(lat, lng)
-      #polygonCords.push new google.maps.LatLng(lat, lng)
-    console.log "PolygonCords"
+        polygonVertices[polygonid].push new google.maps.LatLng(lat, lng)
+      #polygonVertices.push new google.maps.LatLng(lat, lng)
 
+
+    #Create Zones Object
     zones = {}
 
     for c in $(".zone")
@@ -70,21 +71,27 @@ $ ->
       if !(zones[id])
         zones[id] = {code: c.data('code'), color: c.data('color')}
 
+    #Draw each polygon
+    for i of polygonVertices
 
-    console.log zones[1]
-    for i of PolygonCords
-      console.log PolygonCords
-      zoneid = PolygonCords[i].zoneid
-      console.log zones[zoneid].color
+      zoneid = polygonVertices[i].zoneid
+
+      if $("body.plan").length
+        fillcolor = zones[zoneid].color
+      else
+        fillcolor = '#888888'
+
+
       polygon[i] = new google.maps.Polygon
         editable: false
-        paths: PolygonCords[i],
-        strokeColor: '#FF0000',
-        fillColor: zones[zoneid].color,
-        fillOpacity: 0.5,
+        paths: polygonVertices[i],
+        strokeWeight: 0.5,
+        # strokeColor: '#FF0000',
+        fillColor: fillcolor,
+        fillOpacity: 1,
         id: i,
-        planid: PolygonCords[i].planid,
-        name: PolygonCords[i].name
+        planid: polygonVertices[i].planid,
+        name: polygonVertices[i].name
 
       polygon[i].setMap(map)
       google.maps.event.addListener(polygon[i], 'click', showInfo)
@@ -93,10 +100,12 @@ $ ->
 
     # myInfoWindow = new google.maps.InfoWindow()
     # DrawingTools()
-    planOverlay = new google.maps.GroundOverlay(
-      'plan/tungchung_cropped.jpg',
-      imageBounds)
-    planOverlay.setMap(map)
+
+    # overlay image
+    # planOverlay = new google.maps.GroundOverlay(
+    #   'plan/tungchung_cropped.jpg',
+    #   imageBounds)
+    # planOverlay.setMap(map)
 
   DrawingTools = ->
     myDrawingManager = new google.maps.drawing.DrawingManager
@@ -204,7 +213,8 @@ $ ->
     <input type='hidden' name='id' value='#{id}'>
     <input type='hidden' name='paths' value=' " + paths + " '><button>Submit</button><br>
     <a id='modify'>Modify</a>"
-    infoWindow.setContent(content + content_end)
+    infoWindow.setContent(content)
+        # infoWindow.setContent(content + content_end)
     infoWindow.setPosition(event.latLng)
     infoWindow.open(map)
 
@@ -238,7 +248,9 @@ $ ->
   # PlanOverlay.prototype = new google.maps.OverlayView()
   google.maps.event.addDomListener(window, 'load', initializeMap)
 
-
+  $('.btn').click ->
+    $(this).parent().find('.active').removeClass('active')
+    $(this).addClass('active')
 
   $("#btn_address").click ->
     address = $("#address").val()
@@ -255,9 +267,7 @@ $ ->
         else
             alert "geocode not successful"
 
-  $("#print_polygon").click ->
-    alert "hey"
-    console.log polygon
+
 
 PolygonEditable = (val) ->
     myField.setOptions
@@ -265,6 +275,9 @@ PolygonEditable = (val) ->
         draggable: val
     myInfoWindow.close()
     return false
+
+
+
 
 #----start --- add on for image overlay
 

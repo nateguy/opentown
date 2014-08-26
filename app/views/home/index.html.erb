@@ -1,9 +1,9 @@
 
 
-<h1>Home#index</h1>
-
-
   <div class="mainpage">
+
+
+
     <% @plans.each do |plan| %>
       <% polygon = plan.polygons.find_by(polygontype: "planmap") %>
       <% vertices = polygon.vertices %>
@@ -23,7 +23,6 @@
         <input class="input-field" id="address" type="textbox" autofocus>
         <button type="button" class="btn" id="btn_address">Find</button>
         </form>
-        <button type="button" class="btn" id="print_polygon">Print</button>
     </div>
 <!--     <div id="map"></div> -->
     <div id="map-canvas"/>

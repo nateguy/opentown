@@ -19,20 +19,28 @@
     </div>
   </div>
   <div class="span12 case-menu">
-    <div class="btn-group">
-      <a class="btn btn-default">Outline Development Plan</a>
-      <a class="btn btn-default">Background</a>
-      <a class="btn btn-default">Comments</a>
+    <div class="btn-group" data-toggle="btns">
+      <a class="btn btn-default active" href="#odp" data-toggle="tab">Outline Development Plan</a>
+      <a class="btn btn-default" href="#background" data-toggle="tab">Background</a>
+      <a class="btn btn-default" href="#comments" data-toggle="tab">Comments</a>
     </div>
   </div>
-  <div class="row">
 
-    <div id="map-canvas"/></div>
+  <div class="tab-content">
+    <div class="tab-pane active" id="odp">
+        <%= render partial: 'plan/odp', locals: { plan: @plans } %>
+    </div>
+    <div class="tab-pane" id="background">
+        <%= render partial: 'plan/background', locals: { plan: @plans } %>
+    </div>
+    <div class="tab-pane" id="comments">
+        <%= render partial: 'plan/comments', locals: { plan: @plans } %>
+    </div>
+
+
   </div>
-  <div class="row">
-    <% @zones.each do |zone| %>
-        <li class="zone" data-id=<%= zone.id %> data-code=<%= zone.code %> data-color=<%= zone.color_code %> > <div class="legendbox" style="background-color:<%= zone.color_code %>"></div><%= zone.code %> </li>
-    <% end %>
-  </div>
+
+
+
 
 </div>

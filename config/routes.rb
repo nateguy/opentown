@@ -4,8 +4,11 @@ Rails.application.routes.draw do
 
   devise_for :users
   get '/' => "home#index"
+  get '/home' => "home#index"
   get 'plan/:id' => "plan#index"
   post 'plan/comment/:plan_id' => 'plan#comment'
+  get 'plan/comments/' => 'plan#comments'
+  get 'plan/odp/' => 'plan#odp'
   post 'plan/modifypolygon' => 'plan#modifypolygon'
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

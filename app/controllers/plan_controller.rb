@@ -5,15 +5,25 @@ class PlanController < ApplicationController
 
     plan_id = params[:id]
     @plans = Plan.find(plan_id)
-
+    @vertices = Vertex.all
     @users = User.all
     @zones = Zone.all
+
+    respond_to do |format|
+      format.html # index.html.erb
+      format.json { render json: @plans,
+        :include => {:polygons => {
+          :include => {:vertices => { :only => [:id, :lat, :lng]}},
+            :except => [:created_at, :updated_at, :plan_id]}},
+            :except => [:created_at, :updated_at]}
+    end
 
   end
 
   def comments
-    plan_id = params[:id]
-    @comments = Plan.find(plan_id).comments
+    @plan_id = params[:plan_id]
+    # @comments = Plan.find(plan_id).comments
+    # @users = User.all
   end
 
   def modifypolygon
@@ -51,8 +61,10 @@ class PlanController < ApplicationController
       comments.user_id = user_id
       if comments.save == false
         alert "error"
+        render :comments
+      else
+        redirect_to :back
       end
-      redirect_to :back
     end
   end
 end
