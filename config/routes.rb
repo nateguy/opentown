@@ -10,6 +10,7 @@ Rails.application.routes.draw do
   get 'plan/comments/' => 'plan#comments'
   get 'plan/odp/' => 'plan#odp'
   get 'plan/userplan/:id' => 'plan#userplan'
+  post 'plan/userplan/newzone/' => 'plan#newuserzone'
   post 'plan/modifypolygon' => 'plan#modifypolygon'
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

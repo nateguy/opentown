@@ -17,16 +17,10 @@ $ ->
   newOverlay = null
 
   initializeMap = ->
-
-
     geocoder = new google.maps.Geocoder()
-
     imageBounds = new google.maps.LatLngBounds(
       new google.maps.LatLng(22.294193,113.946973)
       new google.maps.LatLng(22.305817,113.966819))
-
-
-
     latlng = new google.maps.LatLng(22.297256, 113.948430)
     mapOptions =
       center: latlng,
@@ -50,6 +44,9 @@ $ ->
 
     #Create polygon vertices
       planid = $(".plan_id").data('planid')
+
+
+
       alert planid
       response = $.ajax(
         url: '/plan/' + planid
@@ -78,8 +75,57 @@ $ ->
           polygon[i].setMap(map)
           google.maps.event.addListener(polygon[i], 'click', showZoneInfo)
           infoWindow = new google.maps.InfoWindow()
+
     if $("body.plan.userplan").length
-      alert "you are in userplan"
+      planid = $(".plan_id").data('planid')
+
+      customPolygons = {}
+
+      $.ajax(
+        url: '/plan/userplan/' + planid
+        dataType: 'json'
+      ).done (data) ->
+        for i of data
+          polygonid = data[i].polygon_id
+          console.log data[i]
+          customPolygons[polygonid] = {}
+          customPolygons[polygonid].zoneid = data[i].custom_zone
+          customPolygons[polygonid].description = data[i].custom_description
+        console.log "custompolygons"
+        console.log customPolygons
+
+      response = $.ajax(
+        url: '/plan/' + planid
+        dataType: 'json'
+      )
+
+      response.done (data) ->
+
+        polygonVertices = createPolygonVertices(data)
+
+        for i of polygonVertices
+          console.log i
+          if customPolygons[i]
+            console.log "true"
+            zoneid = customPolygons[i].zoneid
+          else
+            console.log "false"
+            zoneid = polygonVertices[i].zoneid
+          description = polygonVertices[i].description
+          console.log polygonVertices[i]
+          polygon[i] = new google.maps.Polygon
+            editable: false
+            paths: polygonVertices[i],
+            strokeWeight: 0.5,
+            # strokeColor: '#FF0000',
+            fillColor: zones[zoneid].color,
+            fillOpacity: 1,
+            id: i,
+            description: description
+
+          polygon[i].setMap(map)
+          google.maps.event.addListener(polygon[i], 'click', customInfo)
+          infoWindow = new google.maps.InfoWindow()
 
 
     if $("body.home").length
@@ -152,8 +198,6 @@ $ ->
 
   showZoneInfo = (event) ->
 
-    # console.log event
-    console.log "id of this is: " + this.id
     id = this.id
     planid = this.planid
     name = this.name
@@ -173,6 +217,31 @@ $ ->
     infoWindow.setPosition(event.latLng)
     infoWindow.open(map)
 
+  customInfo = (event) ->
+
+    id = this.id
+    planid = this.planid
+    polygonid = this.polygonid
+    name = this.name
+    description = this.description
+    paths = this.getPath().getArray()
+
+    google.maps.event.addListener(infoWindow, 'domready', ->
+      $('#modify').click ->
+        alert "hey"
+        console.log id
+        )
+    console.log paths
+
+    content = "Change this zone: <form action='/plan/userplan/newzone/' method='post'>Polygon: <input type='text' value='#{id}' name='polygonid'>
+      <br>Change to: <input type='text' name='zoneid'><br>
+      <input type='submit' value='submit'></form>"
+    form = $("#newzoneform").html()
+    console.log "polygonid"
+    console.log this
+    infoWindow.setContent(content)
+    infoWindow.setPosition(event.latLng)
+    infoWindow.open(map)
 
   # PlanOverlay.prototype = new google.maps.OverlayView()
   google.maps.event.addDomListener(window, 'load', initializeMap)

@@ -1,5 +1,5 @@
 class PlanController < ApplicationController
-  protect_from_forgery with: :null_session,  :except => [:comment]
+  protect_from_forgery with: :null_session,  :except => [:comment, :newuserzone]
 
   def index
 
@@ -53,10 +53,49 @@ class PlanController < ApplicationController
 
   end
 
+
+  def newuserzone
+    if user_signed_in?
+
+      polygonid = params[:polygonid]
+      zoneid = params[:zoneid]
+      puts "test polygonid"
+      puts polygonid
+      @pp = polygonid
+      @zz = zoneid
+
+
+      @user_polygons = UserPolygon.all
+      if @user_polygons.exists?(polygon_id: polygonid)
+        i = @user_polygons.find_by(polygon_id: polygonid)
+        i.user_id = User.current.id
+        i.custom_zone = zoneid
+        i.save
+      else
+        i = UserPolygon.new
+        i.polygon_id = polygonid
+        i.user_id = User.current.id
+        i.custom_zone = zoneid
+        i.save
+      end
+    end
+
+  end
+
   def userplan
-    plan_id = params[:id]
-    @plans = Plan.find(plan_id)
-    @zones = Zone.all
+    if user_signed_in?
+      plan_id = params[:id]
+      @plans = Plan.find(plan_id)
+      @zones = Zone.all
+
+      @user_polygons = UserPolygon.where(user_id: User.current.id)
+
+      respond_to do |format|
+        format.html # index.html.erb
+        format.json { render json: @user_polygons }
+      end
+    end
+
   end
 
   def comment
