@@ -35,67 +35,82 @@ $ ->
 
     map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions)
 
-
-    # map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions)
-
-    #Create polygon vertices
-    vertix = $(".vertex")
-
-    for i in vertix
-      i = $(i)
-      planid = i.data('planid')
-      polygonid = i.data('polygonid')
-      planname = i.data('planname')
-      lat = i.data('lat')
-      lng = i.data('lng')
-      console.log planid + " " + lat + " " + lng
-
-      if !(polygonVertices[polygonid])
-        polygonVertices[polygonid] = [new google.maps.LatLng(lat, lng)]
-        polygonVertices[polygonid].name = i.data('planname')
-        polygonVertices[polygonid].planid = i.data('planid')
-        polygonVertices[polygonid].zoneid = i.data('zoneid')
-      else
-        polygonVertices[polygonid].push new google.maps.LatLng(lat, lng)
-      #polygonVertices.push new google.maps.LatLng(lat, lng)
-
-
-    #Create Zones Object
     zones = {}
 
     for c in $(".zone")
       c = $(c)
 
       id = c.data('id')
-      console.log id
+
       if !(zones[id])
         zones[id] = {code: c.data('code'), color: c.data('color')}
 
-    #Draw each polygon
-    for i of polygonVertices
+    # map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions)
+    if $("body.plan.index").length
 
-      zoneid = polygonVertices[i].zoneid
+    #Create polygon vertices
+      planid = $(".plan_id").data('planid')
+      alert planid
+      response = $.ajax(
+        url: '/plan/' + planid
+        dataType: 'json'
+      )
 
-      if $("body.plan").length
-        fillcolor = zones[zoneid].color
-      else
-        fillcolor = '#888888'
+      response.done (data) ->
+
+        polygonVertices = createPolygonVertices(data)
+        console.log "return"
+        console.log polygonVertices
+        for i of polygonVertices
+          zoneid = polygonVertices[i].zoneid
+          description = polygonVertices[i].description
+          console.log polygonVertices[i]
+          polygon[i] = new google.maps.Polygon
+            editable: false
+            paths: polygonVertices[i],
+            strokeWeight: 0.5,
+            # strokeColor: '#FF0000',
+            fillColor: zones[zoneid].color,
+            fillOpacity: 1,
+            id: i,
+            description: description
+
+          polygon[i].setMap(map)
+          google.maps.event.addListener(polygon[i], 'click', showZoneInfo)
+          infoWindow = new google.maps.InfoWindow()
+    if $("body.plan.userplan").length
+      alert "you are in userplan"
 
 
-      polygon[i] = new google.maps.Polygon
-        editable: false
-        paths: polygonVertices[i],
-        strokeWeight: 0.5,
-        # strokeColor: '#FF0000',
-        fillColor: fillcolor,
-        fillOpacity: 1,
-        id: i,
-        planid: polygonVertices[i].planid,
-        name: polygonVertices[i].name
+    if $("body.home").length
+      response = $.ajax(
+        url: 'home'
+        dataType: 'json'
+      )
 
-      polygon[i].setMap(map)
-      google.maps.event.addListener(polygon[i], 'click', showInfo)
-      infoWindow = new google.maps.InfoWindow()
+      response.done (data) ->
+
+        polygonVertices = createPlanVertices(data)
+
+        for i of polygonVertices
+          planid = polygonVertices[i].planid
+          name = polygonVertices[i].name
+          zoneid = polygonVertices[i].zoneid
+
+          polygon[i] = new google.maps.Polygon
+            editable: false
+            paths: polygonVertices[i],
+            strokeWeight: 0.5,
+            # strokeColor: '#FF0000',
+            fillColor: '#888888',
+            fillOpacity: 1,
+            id: i
+            planid: planid,
+            name: name
+
+          polygon[i].setMap(map)
+          google.maps.event.addListener(polygon[i], 'click', showInfo)
+          infoWindow = new google.maps.InfoWindow()
 
 
     # myInfoWindow = new google.maps.InfoWindow()
@@ -106,89 +121,6 @@ $ ->
     #   'plan/tungchung_cropped.jpg',
     #   imageBounds)
     # planOverlay.setMap(map)
-
-  DrawingTools = ->
-    myDrawingManager = new google.maps.drawing.DrawingManager
-      drawingMode: null,
-      drawingControl: true,
-      drawingControlOptions:
-          position: google.maps.ControlPosition.TOP_RIGHT,
-          drawingModes: [
-              google.maps.drawing.OverlayType.POLYGON
-          ]
-      ,
-      polygonOptions:
-          draggable: true,
-          editable: true,
-          fillColor: '#cccccc',
-          fillOpacity: 0.5,
-          strokeColor: '#000000'
-
-    myDrawingManager.setMap(map)
-
-    # FieldDrawingCompletionListener()
-
-
-
-  # FieldDrawingCompletionListener = ->
-
-  #   google.maps.event.addListener(
-  #     myDrawingManager, 'polygoncomplete', (polygon) ->
-  #       myField = polygon
-  #       ShowDrawingTools(false)
-  #       PolygonEditable(false)
-  #       AddPropertyToField()
-  #       FieldClickListener()
-  #   )
-
-  # ShowDrawingTools = (val) ->
-  #   myDrawingManager.setOptions
-  #       drawingMode: null,
-  #       drawingControl: val
-
-  # AddPropertyToField = ->
-  #   obj =
-  #       'id':5,
-  #       'grower':'Joe',
-  #       'farm':'Dream Farm'
-  #   console.log myField
-  #   myField.objInfo = obj
-
-
-  # FieldClickListener = ->
-  #   google.maps.event.addListener(
-  #     myField, 'click', (event) ->
-
-  #       message = GetMessage(myField)
-  #       myInfoWindow.setOptions({ content: message })
-  #       myInfoWindow.setPosition(event.latLng)
-  #       myInfoWindow.open(map)
-  #   )
-
-
-
-  # GetMessage = (polygon) ->
-  #   coordinates = polygon.getPath().getArray()
-  #   message = ''
-
-  #   if typeof myField != undefined
-  #     message += '<h1 style="color:#000">Grower: ' + myField.objInfo.grower + '<br>' + 'Farm: ' + myField.objInfo.farm + '</h1>'
-
-  #   message += '<div style="color:#000">This polygon has ' + coordinates.length + '</div>'
-
-  #   coordinateMessage = '<p style="color:#000">My coordinates are:<br>'
-  #   for i in [0..(coordinates.length - 1)]
-  #     coordinateMessage += coordinates[i].lat() + ', ' + coordinates[i].lng() + '<br>'
-
-  #   coordinateMessage += '</p>'
-
-  #   message += '<p><button onclick=idFunction()>Edit</button> ' + '<a href="#" onclick="PolygonEditable(false)">Done</a> ' + '<a href="#" onclick="DeleteField(myField)">Delete</a></p>' + coordinateMessage
-
-  #   return message
-
-  showNewPoly = (event) ->
-    console.log "rectangle moved"
-
 
 
   showInfo = (event) ->
@@ -225,7 +157,7 @@ $ ->
     id = this.id
     planid = this.planid
     name = this.name
-
+    description = this.description
     paths = this.getPath().getArray()
 
     google.maps.event.addListener(infoWindow, 'domready', ->
@@ -235,12 +167,9 @@ $ ->
         )
     console.log paths
 
-    content = "<a href='plan/#{planid}'>#{name}</a>"
-    content_end = "<br><form id='modifypolygon' action='plan/modifypolygon' method='post'>
-    <input type='hidden' name='id' value='#{id}'>
-    <input type='hidden' name='paths' value=' " + paths + " '><button>Submit</button><br>
-    <a id='modify'>Modify</a>"
-    infoWindow.setContent(content + content_end)
+    content = "this: " + description
+
+    infoWindow.setContent(content)
     infoWindow.setPosition(event.latLng)
     infoWindow.open(map)
 
@@ -251,6 +180,8 @@ $ ->
   $('.btn').click ->
     $(this).parent().find('.active').removeClass('active')
     $(this).addClass('active')
+
+
 
   $("#btn_address").click ->
     address = $("#address").val()
@@ -267,7 +198,32 @@ $ ->
         else
             alert "geocode not successful"
 
+createPlanVertices = (plan) ->
+  polygonVertices = {}
+  for i of plan
 
+    for polygon in plan[i].polygons
+      if polygon.polygontype == "planmap"
+        polygonVertices[polygon.id] = []
+        polygonVertices[polygon.id].planid = plan[i].id
+        polygonVertices[polygon.id].name = plan[i].name
+
+
+        for vertex in polygon.vertices
+          polygonVertices[polygon.id].push new google.maps.LatLng(vertex.lat, vertex.lng)
+  polygonVertices
+
+createPolygonVertices = (data) ->
+  polygonVertices = {}
+  for polygon in data.polygons
+
+    polygonVertices[polygon.id] = []
+    polygonVertices[polygon.id].zoneid = polygon.zone_id
+    polygonVertices[polygon.id].description = polygon.description
+    for vertex in polygon.vertices
+      polygonVertices[polygon.id].push new google.maps.LatLng(vertex.lat, vertex.lng)
+  console.log polygonVertices
+  polygonVertices
 
 PolygonEditable = (val) ->
     myField.setOptions

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140826072825) do
+ActiveRecord::Schema.define(version: 20140827025122) do
 
   create_table "comments", force: true do |t|
     t.integer  "user_id"
@@ -36,6 +36,14 @@ ActiveRecord::Schema.define(version: 20140826072825) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "zone_id"
+    t.string   "description"
+  end
+
+  create_table "user_polygons", force: true do |t|
+    t.integer "user_id"
+    t.integer "polygon_id"
+    t.integer "custom_zone"
+    t.string  "custom_description"
   end
 
   create_table "users", force: true do |t|

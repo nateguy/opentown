@@ -20,6 +20,7 @@ class PlanController < ApplicationController
 
   end
 
+
   def comments
     @plan_id = params[:plan_id]
     # @comments = Plan.find(plan_id).comments
@@ -50,6 +51,12 @@ class PlanController < ApplicationController
 
 
 
+  end
+
+  def userplan
+    plan_id = params[:id]
+    @plans = Plan.find(plan_id)
+    @zones = Zone.all
   end
 
   def comment
