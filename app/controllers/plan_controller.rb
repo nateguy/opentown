@@ -10,7 +10,7 @@ class PlanController < ApplicationController
     @zones = Zone.all
 
     respond_to do |format|
-      format.html # index.html.erb
+      format.html { render :index } # index.html.erb
       format.json { render json: @plans,
         :include => {:polygons => {
           :include => {:vertices => { :only => [:id, :lat, :lng]}},
@@ -91,7 +91,7 @@ class PlanController < ApplicationController
       @user_polygons = UserPolygon.where(user_id: User.current.id)
 
       respond_to do |format|
-        format.html # index.html.erb
+        format.html { render :userplan }
         format.json { render json: @user_polygons }
       end
     end

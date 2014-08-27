@@ -12,6 +12,8 @@ Rails.application.routes.draw do
   get 'plan/userplan/:id' => 'plan#userplan'
   post 'plan/userplan/newzone/' => 'plan#newuserzone'
   post 'plan/modifypolygon' => 'plan#modifypolygon'
+
+  get 'zone' => 'zone#index'
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 

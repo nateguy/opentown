@@ -6,7 +6,7 @@ class HomeController < ApplicationController
 
 
     respond_to do |format|
-      format.html # index.html.erb
+      format.html { render :index }# index.html.erb
 
       format.json { render json: @plans,
         :include => {:polygons => {

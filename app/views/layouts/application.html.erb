@@ -14,7 +14,7 @@
   // </script> -->
   <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=drawing,geometry"></script>
   <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
-  <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+
 
 
 
@@ -38,7 +38,18 @@
         <ul class="nav navbar-nav navbar-right">
           <% if user_signed_in? %>
             <li><div class="logged in"><%= current_user.email %></div></li>
-            <li><%= link_to 'admin', '/admin', :class => 'navbar-link' %></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin <span class="caret"></span></a>
+              <ul class="dropdown-menu" role="menu">
+                <li><a href="/admin/plan/add">Add Plan</a></li>
+                <li><a href="/admin/plan/edit">Edit Plan</a></li>
+                <li class="divider"></li>
+                <li><a href="zone">Edit Zones</a></li>
+
+              </ul>
+            </li>
+
+
             <li><%= link_to 'Edit profile', edit_user_registration_path, :class => 'navbar-link' %></li>
             <li><%= link_to "Logout", destroy_user_session_path, method: :delete, :class => 'navbar-link' %></li>
           <% else %>

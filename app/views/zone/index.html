@@ -1,0 +1,24 @@
+<table class="table table-stripped">
+  <thead>
+    <tr>
+      <th>Code</th>
+      <th>Description</th>
+      <th>Classification</th>
+      <th>Color Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @zones.each do |zone| %>
+    <tr>
+      <td><%= zone.code %></td>
+      <td><%= zone.description %></td>
+      <td><%= zone.classification %></td>
+      <td bgcolor=<%= zone.color_code %>></td>
+      <td><a>Edit</a> <a>Delete</a></td>
+
+    </tr>
+    <% end %>
+    <tr id='newrow'></tr>
+  </tbody>
+</table>
+<button id="add_zone_row">Add new zone</button>
