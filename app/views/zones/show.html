@@ -1,0 +1,24 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Code:</strong>
+  <%= @zone.code %>
+</p>
+
+<p>
+  <strong>Description:</strong>
+  <%= @zone.description %>
+</p>
+
+<p>
+  <strong>Classification:</strong>
+  <%= @zone.classification %>
+</p>
+
+<p>
+  <strong>Color:</strong>
+  <%= @zone.color_code %>
+</p>
+
+<%= link_to 'Edit', edit_zone_path(@zone) %> |
+<%= link_to 'Back', zones_path %>

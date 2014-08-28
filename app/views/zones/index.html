@@ -1,3 +1,5 @@
+
+
 <table class="table table-stripped">
   <thead>
     <tr>
@@ -7,6 +9,7 @@
       <th>Color Code</th>
     </tr>
   </thead>
+
   <tbody>
     <% @zones.each do |zone| %>
     <tr>
@@ -14,11 +17,12 @@
       <td><%= zone.description %></td>
       <td><%= zone.classification %></td>
       <td bgcolor=<%= zone.color_code %>></td>
-      <td><a>Edit</a> <a>Delete</a></td>
 
+      <td><%= link_to 'Edit', edit_zone_path(zone), :class => 'btn btn-primary' %></td>
+      <td><%= link_to 'Delete', zone, method: :delete, data: { confirm: 'Are you sure?' }, :class => 'btn btn-primary' %></td>
     </tr>
     <% end %>
-    <tr id='newrow'></tr>
   </tbody>
 </table>
-<button id="add_zone_row">Add new zone</button>
+
+<%= link_to 'Add New Zone', new_zone_path %>

@@ -21,6 +21,14 @@ class PlanController < ApplicationController
   end
 
 
+  def new
+
+  end
+
+  def create
+
+  end
+
   def comments
     @plan_id = params[:plan_id]
     # @comments = Plan.find(plan_id).comments

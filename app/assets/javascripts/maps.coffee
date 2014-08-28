@@ -193,10 +193,7 @@ $ ->
     $(this).parent().find('.active').removeClass('active')
     $(this).addClass('active')
 
-  $('#add_zone_row').click ->
-    $('#newrow').html("<td><input type='text' name='code' placeholder='code' class='form-control input-md' ></td><td><input type='text' name='description' placeholder='Description' class='form-control input-md' ></td><td><input type='text' name='classification' placeholder='classification' class='form-control input-md' ></td><td>
-      <input type='text' name='color' placeholder='color' class='form-control input-md' ></td>
-      <td><input type='submit' value='Submit' class='form-control input-md'></td>")
+
 
   $("#btn_address").click ->
     address = $("#address").val()
