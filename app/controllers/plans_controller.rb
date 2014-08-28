@@ -1,4 +1,4 @@
-class PlanController < ApplicationController
+class PlansController < ApplicationController
   protect_from_forgery with: :null_session,  :except => [:comment, :newuserzone]
 
   def index
@@ -22,7 +22,7 @@ class PlanController < ApplicationController
 
 
   def new
-
+    @plan = Plan.new
   end
 
   def create

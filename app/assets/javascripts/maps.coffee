@@ -41,16 +41,16 @@ $ ->
 
     # map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions)
 
-    if $("body.plan.index").length
+    if $("body.plans.index").length
       planid = $(".plan_id").data('planid')
       loadAllZones(planid)
 
-    if $("body.plan.userplan").length
+    if $("body.plans.userplan").length
       planid = $(".plan_id").data('planid')
       customPolygons = {}
 
       response = $.ajax(
-        url: '/plan/userplan/' + planid
+        url: '/plans/userplan/' + planid
         dataType: 'json'
       )
 
@@ -100,15 +100,17 @@ $ ->
 
 
   loadAllZones = (planid, customPolygons) ->
+
     response = $.ajax(
-      url: '/plan/' + planid
+      url: '/plans/' + planid
       dataType: 'json'
       )
 
     response.done (data) ->
+
       for polygon in data.polygons
         vertices = []
-        console.log customPolygons
+
 
         if customPolygons? and customPolygons[polygon.id]?
 
@@ -133,6 +135,7 @@ $ ->
           description: description
 
         polygon.setMap(map)
+
         google.maps.event.addListener(polygon, 'click', showZoneInfo)
         infoWindow = new google.maps.InfoWindow()
 
@@ -155,8 +158,8 @@ $ ->
         )
     console.log paths
 
-    content = "<a href='plan/#{planid}'>#{name}</a> #{id}"
-    content_end = "<br><form id='modifypolygon' action='plan/modifypolygon' method='post'>
+    content = "<a href='plans/#{planid}'>#{name}</a> #{id}"
+    content_end = "<br><form id='modifypolygon' action='plans/modifypolygon' method='post'>
     <input type='hidden' name='id' value='#{id}'>
     <input type='hidden' name='paths' value=' " + paths + " '><button>Submit</button><br>
     <a id='modify'>Modify</a>"
@@ -175,7 +178,7 @@ $ ->
 
     content = description + "<br>"
 
-    changeform = "Change this zone: <form action='/plan/userplan/newzone/' method='post'>Polygon: <input type='text' value='#{id}' name='polygonid'>
+    changeform = "Change this zone: <form action='/plans/userplan/newzone/' method='post'>Polygon: <input type='text' value='#{id}' name='polygonid'>
       <br>Change to: <input type='text' name='zoneid'><br>
       <input type='submit' value='submit'></form>"
     if $("body.plan.userplan").length
