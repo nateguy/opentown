@@ -1,32 +1,38 @@
 class PlansController < ApplicationController
   protect_from_forgery with: :null_session,  :except => [:comment, :newuserzone]
+  before_action :set_plan, only: [:show, :edit, :update, :destroy]
 
   def index
 
-    plan_id = params[:id]
-    @plans = Plan.find(plan_id)
-    @vertices = Vertex.all
-    @users = User.all
-    @zones = Zone.all
+  end
 
-    respond_to do |format|
-      format.html { render :index } # index.html.erb
-      format.json { render json: @plans,
-        :include => {:polygons => {
-          :include => {:vertices => { :only => [:id, :lat, :lng]}},
-            :except => [:created_at, :updated_at, :plan_id]}},
-            :except => [:created_at, :updated_at]}
-    end
+  def show
+    @users = User.all
 
   end
 
+  def showall
+    @plans = Plan.all
+  end
 
-  def new
-    @plan = Plan.new
+  def newcomment
+    if user_signed_in?
+      @comment = Comment.new
+    end
   end
 
   def create
+    @plan = Plan.new(plan_params)
 
+    respond_to do |format|
+      if @plan.save
+        format.html { redirect_to plans_url, notice: 'Plan was successfully created.' }
+        format.json { render :show, status: :created, location: @plan }
+      else
+        format.html { render :new }
+        format.json { render json: @plan.errors, status: :unprocessable_entity }
+      end
+    end
   end
 
   def comments
@@ -64,28 +70,31 @@ class PlansController < ApplicationController
 
   def newuserzone
     if user_signed_in?
-
+      @user_polygons = UserPolygon.all
+      user_polygon = nil
       polygonid = params[:polygonid]
       zoneid = params[:zoneid]
-      puts "test polygonid"
-      puts polygonid
-      @pp = polygonid
-      @zz = zoneid
 
 
-      @user_polygons = UserPolygon.all
+
+
+
       if @user_polygons.exists?(polygon_id: polygonid)
-        i = @user_polygons.find_by(polygon_id: polygonid)
-        i.user_id = User.current.id
-        i.custom_zone = zoneid
-        i.save
+        user_polygon = @user_polygons.find_by(polygon_id: polygonid)
+        user_polygon.user_id = User.current.id
+        user_polygon.custom_zone = zoneid
+
       else
-        i = UserPolygon.new
-        i.polygon_id = polygonid
-        i.user_id = User.current.id
-        i.custom_zone = zoneid
-        i.save
+        user_polygon = UserPolygon.new(user_id: User.current.id, custom_zone: zoneid)
       end
+
+      if user_polygon.save
+        redirect_to :back, notice: 'Plan was successfully created.'
+      else
+        render :userplan
+      end
+
+
     end
 
   end
@@ -106,7 +115,15 @@ class PlansController < ApplicationController
 
   end
 
-  def comment
+
+  def comment_new
+    if user_signed_in?
+      @plans_comment = Comment.new
+    end
+  end
+
+
+  def comment_create
     if user_signed_in?
       user_id = User.current.id
       comments = Comment.new
@@ -121,4 +138,15 @@ class PlansController < ApplicationController
       end
     end
   end
+
+  private
+    def set_plan
+      @plan = Plan.find(params[:id])
+      @zones = Zone.all
+    end
+
+    def plan_params
+      params.require(:plan).permit(:name, :district, :content)
+    end
+
 end

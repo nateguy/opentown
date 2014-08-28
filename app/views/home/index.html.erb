@@ -1,22 +1,3 @@
-
-
-  <div class="mainpage">
-
-
-
-    <% @plans.each do |plan| %>
-      <% polygon = plan.polygons.find_by(polygontype: "planmap") %>
-      <% vertices = polygon.vertices %>
-        <% vertices.each do |vertex| %>
-
-            <li class="vertex" data-planname="<%=plan.name %>" data-planid=<%=polygon.plan_id %> data-polygonid=<%= polygon.id %> data-lat=<%= vertex.lat %> data-lng=<%= vertex.lng %> ></li>
-        <% end %>
-
-    <% end %>
-  </div>
-
-
-
     <div id="panel">
         <h2>Find a Location</h2>
         <form class="map_address">

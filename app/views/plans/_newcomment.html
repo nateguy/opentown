@@ -1,0 +1,39 @@
+
+<!-- Modal -->
+<div class="modal fade" id="newComment" tabindex="-1" role="dialog" aria-labelledby="newCommentLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="newCommentLabel">Add New Comment</h4>
+        Signed in as <%= current_user.email %><br>
+        Posting on <%= @plan.name %>
+      </div>
+      <div class="modal-body">
+        <%= form_for Comment.new do |f| %>
+
+          <div class="field">
+
+            <%= f.text_area :content, placeholder: 'Comments' %>
+          </div>
+          <div class="field">
+          <%= f.hidden_field :plan_id, value: @plan.id %>
+          </div>
+          <div class="field">
+          <%= f.hidden_field :user_id, value: current_user.id %>
+          </div>
+        </div>
+
+      <div class="modal-footer">
+
+          <%= f.submit "Create", :class => "btn btn-primary" %>
+
+        <% end %>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
+
+
+      </div>
+    </div>
+  </div>
+</div>

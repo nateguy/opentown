@@ -10,22 +10,19 @@ centerpoint = null
 # overlay = null
 polygon = []
 polygonVertices = {}
+zones = {}
 
 $ ->
 
 
   newOverlay = null
+  zones = zoneTypes()
 
-  zones = {}
-  for c in $(".zone")
-    c = $(c)
 
-    id = c.data('id')
 
-    if !(zones[id])
-      zones[id] = {code: c.data('code'), color: c.data('color')}
 
   initializeMap = ->
+
     geocoder = new google.maps.Geocoder()
     imageBounds = new google.maps.LatLngBounds(
       new google.maps.LatLng(22.294193,113.946973)
@@ -41,30 +38,50 @@ $ ->
 
     # map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions)
 
-    if $("body.plans.index").length
+    if $("body.plans.show").length
+
       planid = $(".plan_id").data('planid')
+
       loadAllZones(planid)
 
     if $("body.plans.userplan").length
+
       planid = $(".plan_id").data('planid')
-      customPolygons = {}
-
-      response = $.ajax(
-        url: '/plans/userplan/' + planid
-        dataType: 'json'
-      )
-
-      response.done (data) ->
-        for i of data
-          polygonid = data[i].polygon_id
-          customPolygons[polygonid] = {}
-          customPolygons[polygonid].zone_id = data[i].custom_zone
-          customPolygons[polygonid].description = data[i].custom_description
-
+      console.log "body plans userplan " + planid
+      customPolygons = loadCustomPolygons(planid)
+      console.log customPolygons
       loadAllZones(planid, customPolygons)
 
     if $("body.home").length
       loadPlansOnly()
+
+  loadCustomPolygons = (planid) ->
+    customPolygons = {}
+    for userpolygon in $(".user_polygon")
+      polygonid = $(userpolygon).data('polygon')
+
+      customPolygons[polygonid] = {}
+      customPolygons[polygonid].zoneid = $(userpolygon).data('zone')
+      customPolygons[polygonid].description = $(userpolygon).data('description')
+    customPolygons
+    #     customPolygons[polygonid].description = data[i].custom_description
+    # customPolygons = {}
+
+    # response = $.ajax(
+    #   url: '/plans/userplan/' + planid
+    #   dataType: 'json'
+    # )
+
+    # response.done (data) ->
+
+    #   console.log data
+    #   for i of data
+    #     polygonid = data[i].polygon_id
+    #     customPolygons[polygonid] = {}
+    #     customPolygons[polygonid].zone_id = data[i].custom_zone
+    #     customPolygons[polygonid].description = data[i].custom_description
+    #   console.log "returning custom polygons"
+    # customPolygons
 
   loadPlansOnly = ->
     response = $.ajax(
@@ -107,14 +124,14 @@ $ ->
       )
 
     response.done (data) ->
-
+      console.log data
       for polygon in data.polygons
         vertices = []
-
-
+        console.log "before custom polygon decider"
+        console.log customPolygons
         if customPolygons? and customPolygons[polygon.id]?
 
-          zoneid = customPolygons[polygon.id].zone_id
+          zoneid = customPolygons[polygon.id].zoneid
           description = customPolygons[polygon.id].description
         else
 
@@ -129,11 +146,11 @@ $ ->
           editable: false
           paths: vertices,
           strokeWeight: 0.5,
-          fillColor: zones[zoneid].color,
+          fillColor: zones[zoneid].color_code,
           fillOpacity: 1,
           id: polygon.id,
           description: description
-
+        console.log "polygon " + polygon.id
         polygon.setMap(map)
 
         google.maps.event.addListener(polygon, 'click', showZoneInfo)
@@ -156,7 +173,6 @@ $ ->
         alert "hey"
         console.log id
         )
-    console.log paths
 
     content = "<a href='plans/#{planid}'>#{name}</a> #{id}"
     content_end = "<br><form id='modifypolygon' action='plans/modifypolygon' method='post'>
@@ -170,21 +186,27 @@ $ ->
 
   showZoneInfo = (event) ->
 
+
     id = this.id
     planid = this.planid
     name = this.name
     description = this.description
     paths = this.getPath().getArray()
+    console.log this
+    selectbox = ""
+    for id of zones
+      selectbox += "<option value=#{id}>#{zones[id].description}</option>"
 
-    content = description + "<br>"
 
-    changeform = "Change this zone: <form action='/plans/userplan/newzone/' method='post'>Polygon: <input type='text' value='#{id}' name='polygonid'>
-      <br>Change to: <input type='text' name='zoneid'><br>
+    changeform = "Change this zone: <form action='/plans/userplan/newzone/' method='post'>Polygon:
+    <input type='text' value='#{this.id}' name='polygonid'>
+      <br>Change to: <select name='zoneid'>" + selectbox + "</select><br>
+
       <input type='submit' value='submit'></form>"
-    if $("body.plan.userplan").length
-      infoWindow.setContent(content + changeform)
+    if $("body.plans.userplan").length
+      infoWindow.setContent(description + "<br>" + changeform)
     else
-      infoWindow.setContent(content)
+      infoWindow.setContent(description)
     infoWindow.setPosition(event.latLng)
     infoWindow.open(map)
 
@@ -213,6 +235,29 @@ $ ->
         else
             alert "geocode not successful"
 
+zoneTypes = ->
+
+
+  response = $.ajax(
+    url: '/zones'
+    dataType: 'json'
+  )
+
+  response.done (data) ->
+    console.log data
+
+    for i of data
+
+      console.log data[i].id
+      id = data[i].id
+      code = data[i].code
+      description = data[i].description
+      classification = data[i].classification
+      color_code = data[i].color_code
+
+      zones[id] = { code: code, description: description, classification: classification, color_code: color_code}
+
+  zones
 
 
 PolygonEditable = (val) ->

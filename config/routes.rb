@@ -5,16 +5,21 @@ Rails.application.routes.draw do
   devise_for :users
   get '/' => "home#index"
   get '/home' => "home#index"
-  get 'plans/:id' => "plans#index"
-  post 'plans/comment/:plan_id' => 'plans#comment'
-  get 'plans/comments/' => 'plans#comments'
+  #get 'plans/:id' => "plans#index"
+
+#  get 'plans/newcomment' => 'plans#newcomment'
+
+#  post 'plans/comment/:plan_id' => 'plans#comment'
+#  get 'plans/comments/' => 'plans#comments'
   get 'plans/odp/' => 'plans#odp'
-  get 'plans/userplan/:id' => 'plans#userplan'
-  post 'plans/userplan/newzone/' => 'plans#newuserzone'
+  get 'plans/userplan/' => 'plans#userplan'
+  post 'plans/userplan/:id' => 'plans#newuserzone'
   post 'plans/modifypolygon' => 'plans#modifypolygon'
+  get 'plans/all' => 'plans#showall'
 
   resources :zones
   resources :plans
+  resources :comments
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 

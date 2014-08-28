@@ -2,6 +2,9 @@
 
 <li class="plan_id" data-planid=<%=@plans.id %>> <%=@plans.id %> </li>
 
+<% @user_polygons.each do |polygon| %>
+  <li class="user_polygon" data-polygon=<%= polygon.polygon_id %> data-zone=<%= polygon.custom_zone %> data-description='<%= polygon.custom_description %>'></li>
+<% end %>
   <div class="row">
 
     <div id="map-canvas"/></div>

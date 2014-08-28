@@ -55,6 +55,6 @@ class ZonesController < ApplicationController
     end
 
     def zone_params
-      params.require(:zone).permit(:code, :description, :classification, :color_code)
+      params.require(:zone).permit(:id, :code, :description, :classification, :color_code)
     end
 end
