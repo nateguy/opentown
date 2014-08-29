@@ -6,9 +6,21 @@ class PlansController < ApplicationController
 
   end
 
+  def new
+    @plan = Plan.new
+  end
+
   def show
     @users = User.all
 
+  end
+
+  def destroy
+    @plan.destroy
+    respond_to do |format|
+      format.html { redirect_to plans_url, notice: 'Plan removed.' }
+      format.json { head :no_content }
+    end
   end
 
   def showall

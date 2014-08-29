@@ -27,7 +27,7 @@
         <%= render partial: 'plans/background', locals: { plan: @plan } %>
     </div>
     <div class="tab-pane" id="comments">
-        <%= render partial: 'plans/comments', locals: { plan: @plan } %>
+        <%= render template: 'comments/show', locals: { plan: @plan } %>
     </div>
 
   </div>

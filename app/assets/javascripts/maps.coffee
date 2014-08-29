@@ -38,6 +38,13 @@ $ ->
 
     # map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions)
 
+    if $("body.plans.edit").length
+
+      planid = $(".plan_id").data('planid')
+
+      loadAllZones(planid)
+
+
     if $("body.plans.show").length
 
       planid = $(".plan_id").data('planid')
@@ -124,7 +131,7 @@ $ ->
       )
 
     response.done (data) ->
-      console.log data
+
       for polygon in data.polygons
         vertices = []
         console.log "before custom polygon decider"
@@ -142,8 +149,13 @@ $ ->
         for vertex in polygon.vertices
           vertices.push new google.maps.LatLng(vertex.lat, vertex.lng)
 
+        if $("body.plans.edit").length
+          editable = true
+        else
+          editable = false
+
         polygon = new google.maps.Polygon
-          editable: false
+          editable: editable
           paths: vertices,
           strokeWeight: 0.5,
           fillColor: zones[zoneid].color_code,

@@ -25,6 +25,14 @@ class CommentsController < ApplicationController
 
   end
 
+  def update_content
+    content = params[:content]
+    id = params[:id]
+    @comment = Comment.find(params[:id])
+    @comment.content = params[:content]
+    @comment.save
+
+  end
 
   def update
 

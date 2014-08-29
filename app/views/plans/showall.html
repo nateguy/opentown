@@ -1,0 +1,24 @@
+
+
+<table class="table table-stripped">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>District</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @plans.each do |plan| %>
+    <tr>
+      <td><%= plan.id %></td>
+      <td><%= plan.name %></td>
+      <td><%= plan.district %></td>
+
+      <td><%= link_to 'Edit', edit_plan_path(plan), :class => 'btn btn-primary' %></td>
+      <td><%= link_to 'Destroy', plan, method: :delete, data: { confirm: 'Are you sure?' }, :class => 'btn btn-primary' %></td>
+    </tr>
+    <% end %>
+  </tbody>
+</table>

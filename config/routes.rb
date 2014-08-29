@@ -1,6 +1,5 @@
 Rails.application.routes.draw do
 
-  get 'plan' => 'plan#index'
 
   devise_for :users
   get '/' => "home#index"
@@ -16,6 +15,7 @@ Rails.application.routes.draw do
   post 'plans/userplan/:id' => 'plans#newuserzone'
   post 'plans/modifypolygon' => 'plans#modifypolygon'
   get 'plans/all' => 'plans#showall'
+  patch '/comments' => 'comments#update_content'
 
   resources :zones
   resources :plans

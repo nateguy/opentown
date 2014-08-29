@@ -15,11 +15,16 @@
               <div class="content">
                 <%=comment.content %>
               </div>
+              <div id="editcontent<%= comment.id %>">
+                <%=comment.content %>
+              </div>
               <div class="footer">
                 <% if user_signed_in? %>
-                  <%= link_to 'Edit', edit_comment_path(comment) %>
-                  <a data-toggle='modal' data-target="#newComment">Edit</a> Delete Like
+                  <button class="editcontentbtn" data-comment-id='<%= comment.id %>'>Edit</button>
+                  <%= link_to 'Edit', edit_comment_path(comment), 'data-toggle' => 'modal', 'data-target' => '#editComment' %> Delete Like
                 <% end %>
+
+
               </div>
             </div>
           </li>
