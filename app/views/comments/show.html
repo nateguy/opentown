@@ -16,15 +16,21 @@
 
               <div class="footer">
                 <% if user_signed_in? %>
-                  <% if comment.user_id = current_user %>
-                    <a class="editcontentbtn" data-comment-id='<%= comment.id %>'>Edit</a>
-                    <%= link_to 'Delete', comment, method: :delete, data: { confirm: 'Are you sure?' } %>
-                  <% end %>
+
+
+
                   <div id="like_div_<%=comment.id %>" data-comment-id='<%= comment.id %>'>
                     <% @comment = comment %>
                     <%= render 'likes/like_link', comment: @comment %>
 
                   </div>
+                  <span class="editbar" id="total_likes_<%=comment.id %>">
+                    <%=@comment.likes.count %> Likes</span>
+
+                  <% if comment.user_id = current_user %>
+                    <span class="editbar"><a class="editcontentbtn" data-comment-id='<%= comment.id %>'>Edit</a></span>
+                    <span class="editbar"><%= link_to 'Delete', comment, method: :delete, data: { confirm: 'Are you sure?' } %></span>
+                  <% end %>
                 <% end %>
 
 

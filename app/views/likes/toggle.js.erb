@@ -1,1 +1,3 @@
 $("#like_div_<%=@comment.id %>").html("<%= escape_javascript render('likes/like_link') %>")
+
+$("#total_likes_<%=@comment.id %>").html("<%=@comment.likes.count %> Likes")
