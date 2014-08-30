@@ -20,7 +20,7 @@
                     <a class="editcontentbtn" data-comment-id='<%= comment.id %>'>Edit</a>
                     <%= link_to 'Delete', comment, method: :delete, data: { confirm: 'Are you sure?' } %>
                   <% end %>
-                  <div id="like_div">
+                  <div id="like_div_<%=comment.id %>" data-comment-id='<%= comment.id %>'>
                     <% @comment = comment %>
                     <%= render 'likes/like_link', comment: @comment %>
 

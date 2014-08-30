@@ -1,1 +1,1 @@
-$("#like_div").html("<%= escape_javascript render('likes/like_link') %>")
+$("#like_div_<%=@comment.id %>").html("<%= escape_javascript render('likes/like_link') %>")
