@@ -33,12 +33,15 @@ $ ->
     #   zoom: 15
 
 
+    # if $("body.plans.edit").length
+    #   planid = $(".plan_id").data('planid')
 
+    #   zoneEditor()
 
 
     if $("body.plans.edit").length
-
       planid = $(".plan_id").data('planid')
+
 
       loadAllZones(planid)
 
@@ -59,7 +62,37 @@ $ ->
     if $("body.home").length
       loadPlansOnly()
 
+  zoneEditor = ->
+    mapOptions =
+      center: new google.maps.LatLng(-34.397, 150.644),
+      zoom: 8
 
+    map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions)
+
+    drawingManager = new google.maps.drawing.DrawingManager(
+      drawingMode: google.maps.drawing.OverlayType.MARKER
+      drawingControl: true
+      drawingControlOptions:
+        position: google.maps.ControlPosition.TOP_CENTER
+        drawingModes: [
+          google.maps.drawing.OverlayType.MARKER,
+
+          google.maps.drawing.OverlayType.POLYGON,
+          google.maps.drawing.OverlayType.POLYLINE
+        ]
+
+      markerOptions:
+        icon: 'images/beachflag.png'
+
+      circleOptions:
+        fillColor: '#ffff00'
+        fillOpacity: 1
+        strokeWeight: 5
+        clickable: false
+        editable: true
+        zIndex: 1
+    )
+    drawingManager.setMap map
 
 
   loadCustomPolygons = (planid) ->
@@ -71,24 +104,7 @@ $ ->
       customPolygons[polygonid].zoneid = $(userpolygon).data('zone')
       customPolygons[polygonid].description = $(userpolygon).data('description')
     customPolygons
-    #     customPolygons[polygonid].description = data[i].custom_description
-    # customPolygons = {}
 
-    # response = $.ajax(
-    #   url: '/plans/userplan/' + planid
-    #   dataType: 'json'
-    # )
-
-    # response.done (data) ->
-
-    #   console.log data
-    #   for i of data
-    #     polygonid = data[i].polygon_id
-    #     customPolygons[polygonid] = {}
-    #     customPolygons[polygonid].zone_id = data[i].custom_zone
-    #     customPolygons[polygonid].description = data[i].custom_description
-    #   console.log "returning custom polygons"
-    # customPolygons
 
   loadPlansOnly = ->
     response = $.ajax(
@@ -139,6 +155,74 @@ $ ->
     [lats_avg, lngs_avg]
 
 
+
+  DrawZonesTest = (planid) ->
+
+
+
+    response = $.ajax(
+      url: '/plans/' + planid
+      dataType: 'json'
+      )
+
+    response.done (data) ->
+
+      center = centerMap(data.polygons)
+      latlng = new google.maps.LatLng(center[0], center[1])
+      mapOptions =
+        center: latlng,
+        zoom: 15
+      map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions)
+
+      drawingManager = new google.maps.drawing.DrawingManager(
+        drawingMode: google.maps.drawing.OverlayType.MARKER
+        drawingControl: true
+        drawingControlOptions:
+          position: google.maps.ControlPosition.TOP_CENTER
+          drawingModes: [
+            google.maps.drawing.OverlayType.MARKER,
+            google.maps.drawing.OverlayType.CIRCLE,
+            google.maps.drawing.OverlayType.POLYGON,
+            google.maps.drawing.OverlayType.POLYLINE
+          ]
+
+        markerOptions:
+          icon: 'images/beachflag.png'
+
+        polygonOptions:
+          fillColor: '#ffff00'
+          fillOpacity: 1
+          strokeWeight: 5
+          clickable: false
+          editable: true
+          zIndex: 1
+      )
+      drawingManager.setMap map
+
+      for polygon in data.polygons
+        vertices = []
+        zoneid = polygon.zone_id
+
+        for vertex in polygon.vertices
+          vertices.push new google.maps.LatLng(vertex.lat, vertex.lng)
+
+        polygon = new google.maps.Polygon
+          editable: true
+          paths: vertices,
+          strokeWeight: 0.5,
+          fillColor: zones[zoneid].color_code,
+          fillOpacity: 1,
+          id: polygon.id,
+          description: olygon.description
+        polygon.setMap(map)
+
+        google.maps.event.addListener(polygon, 'click', showZoneInfo)
+        infoWindow = new google.maps.InfoWindow()
+
+
+
+
+
   loadAllZones = (planid, customPolygons) ->
 
 
@@ -157,7 +241,30 @@ $ ->
         zoom: 15
       map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions)
 
+      drawingManager = new google.maps.drawing.DrawingManager(
+        drawingMode: google.maps.drawing.OverlayType.MARKER
+        drawingControl: true
+        drawingControlOptions:
+          position: google.maps.ControlPosition.TOP_CENTER
+          drawingModes: [
+            google.maps.drawing.OverlayType.MARKER,
+            google.maps.drawing.OverlayType.CIRCLE,
+            google.maps.drawing.OverlayType.POLYGON,
+            google.maps.drawing.OverlayType.POLYLINE
+          ]
 
+        markerOptions:
+          icon: 'images/beachflag.png'
+
+        polygonOptions:
+          fillColor: '#ffff00'
+          fillOpacity: 1
+          strokeWeight: 5
+          clickable: false
+          editable: true
+          zIndex: 1
+      )
+      drawingManager.setMap map
 
       for polygon in data.polygons
         vertices = []
