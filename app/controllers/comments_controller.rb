@@ -1,5 +1,6 @@
 class CommentsController < ApplicationController
   before_action :set_comment, only: [:show, :edit, :update, :destroy]
+  protect_from_forgery with: :null_session,  :except => [:update_comment]
 
   def index
     @comments = Comment.all
@@ -25,19 +26,22 @@ class CommentsController < ApplicationController
 
   end
 
-  def update_content
-    content = params[:content]
-    id = params[:id]
+  def update_comment
+
     @comment = Comment.find(params[:id])
     @comment.content = params[:content]
-    @comment.save
+    if @comment.save
+      redirect_to :back
+    else
+      render :new
+    end
 
   end
 
   def update
 
       if @comment.update(comment_params)
-        redirect_to comments_url, notice: 'Zone was successfully updated.'
+        redirect_to comments_url, notice: 'Comment was successfully updated.'
        else
         render :edit
       end
@@ -47,6 +51,7 @@ class CommentsController < ApplicationController
 
   def destroy
     @comment.destroy
+    redirect_to :back
   end
 
 

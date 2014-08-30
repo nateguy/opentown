@@ -27,16 +27,14 @@ $ ->
     imageBounds = new google.maps.LatLngBounds(
       new google.maps.LatLng(22.294193,113.946973)
       new google.maps.LatLng(22.305817,113.966819))
-    latlng = new google.maps.LatLng(22.297256, 113.948430)
-    mapOptions =
-      center: latlng,
-      zoom: 15
+    # latlng = new google.maps.LatLng(22.297256, 113.948430)
+    # mapOptions =
+    #   center: latlng,
+    #   zoom: 15
 
 
-    map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions)
 
 
-    # map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions)
 
     if $("body.plans.edit").length
 
@@ -48,7 +46,6 @@ $ ->
     if $("body.plans.show").length
 
       planid = $(".plan_id").data('planid')
-
       loadAllZones(planid)
 
     if $("body.plans.userplan").length
@@ -61,6 +58,9 @@ $ ->
 
     if $("body.home").length
       loadPlansOnly()
+
+
+
 
   loadCustomPolygons = (planid) ->
     customPolygons = {}
@@ -97,6 +97,11 @@ $ ->
     )
 
     response.done (data) ->
+      latlng = new google.maps.LatLng(22.297256, 113.948430)
+      mapOptions =
+        center: latlng,
+        zoom: 15
+      map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions)
 
       for i of data
         planid = data[i].id
@@ -121,9 +126,22 @@ $ ->
           google.maps.event.addListener(polygon, 'click', showInfo)
           infoWindow = new google.maps.InfoWindow()
 
+  centerMap = (polygons) ->
+    for polygon in polygons
+      if polygon.polygontype == "planmap"
+        vertices = polygon.vertices
+        lats = vertices.map (vertex) ->
+          vertex.lat
+        lngs = vertices.map (vertex) ->
+          vertex.lng
+        lats_avg = (lats.reduce (t, s) -> t + s) / lats.length
+        lngs_avg = (lngs.reduce (t, s) -> t + s) / lngs.length
+    [lats_avg, lngs_avg]
 
 
   loadAllZones = (planid, customPolygons) ->
+
+
 
     response = $.ajax(
       url: '/plans/' + planid
@@ -131,6 +149,15 @@ $ ->
       )
 
     response.done (data) ->
+
+      center = centerMap(data.polygons)
+      latlng = new google.maps.LatLng(center[0], center[1])
+      mapOptions =
+        center: latlng,
+        zoom: 15
+      map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions)
+
+
 
       for polygon in data.polygons
         vertices = []
@@ -226,7 +253,7 @@ $ ->
   # PlanOverlay.prototype = new google.maps.OverlayView()
   google.maps.event.addDomListener(window, 'load', initializeMap)
 
-  $('.btn').click ->
+  $('#plantabs .btn').click ->
     $(this).parent().find('.active').removeClass('active')
     $(this).addClass('active')
 

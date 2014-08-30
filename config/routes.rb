@@ -2,6 +2,7 @@ Rails.application.routes.draw do
 
 
   devise_for :users
+  post 'comments/update_comment' => 'comments#update_comment'
   get '/' => "home#index"
   get '/home' => "home#index"
   #get 'plans/:id' => "plans#index"
@@ -15,11 +16,13 @@ Rails.application.routes.draw do
   post 'plans/userplan/:id' => 'plans#newuserzone'
   post 'plans/modifypolygon' => 'plans#modifypolygon'
   get 'plans/all' => 'plans#showall'
-  patch '/comments' => 'comments#update_content'
+
 
   resources :zones
   resources :plans
   resources :comments
+  resources :likes, only: [:create, :destroy]
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 

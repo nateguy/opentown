@@ -5,6 +5,7 @@ class User < ActiveRecord::Base
          :recoverable, :rememberable, :trackable, :validatable
   has_many :comments
   has_many :polygons, :through => :user_polygons
+  has_many :likes
 
   def self.current
     Thread.current[:user]

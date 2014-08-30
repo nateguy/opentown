@@ -1,0 +1,13 @@
+  <% current_user = User.current %>
+
+  <% if like = current_user.likes.find_by_comment_id(@comment.id) %>
+    <%= form_for like, :html => { method: :delete }, remote: true do |f| %>
+      <%= f.submit "Unlike", class: "btn btn-default btn-xs" %>
+      <% end %>
+  <% else %>
+    <%= form_for current_user.likes.new(comment_id: @comment.id), remote: true do |f| %>
+      <%= f.hidden_field :comment_id %>
+      <%= f.hidden_field :user_id %>
+      <%= f.submit "Like", class: "btn btn-default btn-xs" %>
+    <% end %>
+  <% end %>
