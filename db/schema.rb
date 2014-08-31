@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140829182321) do
+ActiveRecord::Schema.define(version: 20140831020306) do
 
   create_table "comments", force: true do |t|
     t.integer  "user_id"
@@ -88,6 +88,10 @@ ActiveRecord::Schema.define(version: 20140829182321) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "color_code"
+    t.string   "texture_file_name"
+    t.string   "texture_content_type"
+    t.integer  "texture_file_size"
+    t.datetime "texture_updated_at"
   end
 
 end

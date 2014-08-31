@@ -1,0 +1,29 @@
+
+  <%= form_for(@zone, url: zone_path) do |f| %>
+    fdsfdsfds
+    <div class="field">
+      <%= f.label :code %>
+      <%= f.text_field :code %>
+    </div>
+    <div class="field">
+      <%= f.label :description %>
+      <%= f.text_field :description %>
+    </div>
+    <div class="field">
+      <%= f.label :classification %>
+      <%= f.text_field :classification %>
+    </div>
+    <div class="field">
+      <%= f.label :color_code %>
+      <%= f.color_field :color_code %>
+    </div>
+    <div class="field">
+      <%= image_tag @zone.texture.url(:thumb) %>
+      <%= f.label :texture %>
+      <%= f.file_field :texture %>
+    </div>
+
+    <div class="actions">
+      <%= f.submit %>
+    </div>
+  <% end %>

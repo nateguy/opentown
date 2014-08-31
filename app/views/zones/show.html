@@ -20,5 +20,10 @@
   <%= @zone.color_code %>
 </p>
 
+<p>
+  <strong>Color:</strong>
+<%= image_tag @zone.texture.url(:medium) %>
+</p>
+
 <%= link_to 'Edit', edit_zone_path(@zone) %> |
 <%= link_to 'Back', zones_path %>

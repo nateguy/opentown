@@ -41,17 +41,19 @@ $ ->
 
     if $("body.plans.edit").length
       planid = $(".plan_id").data('planid')
+      console.log "edit"
 
-
-      loadAllZones(planid)
+      DrawZonesTest(planid)
 
 
     if $("body.plans.show").length
+      console.log "show"
 
       planid = $(".plan_id").data('planid')
       loadAllZones(planid)
 
     if $("body.plans.userplan").length
+      console.log "userplan"
 
       planid = $(".plan_id").data('planid')
       console.log "body plans userplan " + planid
@@ -158,8 +160,6 @@ $ ->
 
   DrawZonesTest = (planid) ->
 
-
-
     response = $.ajax(
       url: '/plans/' + planid
       dataType: 'json'
@@ -192,8 +192,8 @@ $ ->
         polygonOptions:
           fillColor: '#ffff00'
           fillOpacity: 1
-          strokeWeight: 5
-          clickable: false
+          strokeWeight: 1
+          clickable: true
           editable: true
           zIndex: 1
       )
@@ -211,15 +211,79 @@ $ ->
           paths: vertices,
           strokeWeight: 0.5,
           fillColor: zones[zoneid].color_code,
-          fillOpacity: 1,
+          fillOpacity: 0.5,
           id: polygon.id,
-          description: olygon.description
+          description: polygon.description
         polygon.setMap(map)
-
-        google.maps.event.addListener(polygon, 'click', showZoneInfo)
+        addDeleteButton(polygon, 'http://i.imgur.com/RUrKV.png')
+        google.maps.event.addListener(polygon, 'click', showZoneEdit)
         infoWindow = new google.maps.InfoWindow()
 
+  addDeleteButton = (polygon, imageUrl) ->
+    path = polygon.getPath()
+    path["btnDeleteClickHandler"] = {}
+    path["btnDeleteImageUrl"] = imageUrl
+    google.maps.event.addListener(polygon.getPath(), 'set_at', pointUpdated)
+    google.maps.event.addListener(polygon.getPath(), 'insert_at', pointUpdated)
 
+  pointUpdated = (index) ->
+
+    path = this
+
+    if btnDelete? is false
+
+      undoimg = $("img[src$='https://maps.gstatic.com/mapfiles/undo_poly.png']")
+
+      undoimg.parent().css('height', '21px !important')
+      undoimg.parent().parent().append('<div style="overflow-x: hidden; overflow-y: hidden; position: absolute; width: 30px; height: 27px; top:21px;">
+        <img src="' + path.btnDeleteImageUrl + '" class="deletePoly" style="height:auto; width:auto; position: absolute; left:0;"/>
+          </div>')
+      btnDelete = getDeleteButton(path.btnDeleteImageUrl)
+      btnDelete.hover (->
+        $(this).css "left", "-30px"
+        false
+      ), (->
+        $(this).css "left", "0px"
+        false
+      )
+      btnDelete.mousedown ->
+        $(this).css "left", "-60px"
+        false
+
+    if path.btnDeleteClickHandler
+      btnDelete.unbind('click', path.btnDeleteClickHandler)
+
+    path.btnDeleteClickHandler = ->
+      path.removeAt(index)
+      false
+
+    btnDelete.click(path.btnDeleteClickHandler)
+
+  getDeleteButton = (imageUrl) ->
+    console.log "deletebtn" + imageUrl
+    $("img[src$='" + imageUrl + "']")
+
+  showZoneEdit = (event) ->
+
+    if event.vertex == undefined
+      content = ""
+    else
+      content = "This is a vertex"
+
+
+    id = this.id
+    planid = this.planid
+    name = this.name
+    description = this.description
+    paths = this.getPath().getArray()
+    console.log id
+
+    content = "Description <input name='description' type='text' value='#{description}'>
+               <br>Polygon Type: <select name='polygontype'><option value='planmap'>Plan</option><option value='zone'>Zone</option></select>"
+    console.log event.latLng.lat() + " " + event.latLng.lng()
+    infoWindow.setContent(content)
+    infoWindow.setPosition(event.latLng)
+    infoWindow.open(map)
 
 
 
@@ -241,30 +305,7 @@ $ ->
         zoom: 15
       map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions)
 
-      drawingManager = new google.maps.drawing.DrawingManager(
-        drawingMode: google.maps.drawing.OverlayType.MARKER
-        drawingControl: true
-        drawingControlOptions:
-          position: google.maps.ControlPosition.TOP_CENTER
-          drawingModes: [
-            google.maps.drawing.OverlayType.MARKER,
-            google.maps.drawing.OverlayType.CIRCLE,
-            google.maps.drawing.OverlayType.POLYGON,
-            google.maps.drawing.OverlayType.POLYLINE
-          ]
 
-        markerOptions:
-          icon: 'images/beachflag.png'
-
-        polygonOptions:
-          fillColor: '#ffff00'
-          fillOpacity: 1
-          strokeWeight: 5
-          clickable: false
-          editable: true
-          zIndex: 1
-      )
-      drawingManager.setMap map
 
       for polygon in data.polygons
         vertices = []

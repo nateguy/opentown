@@ -17,12 +17,18 @@
       <td><%= zone.description %></td>
       <td><%= zone.classification %></td>
       <td bgcolor=<%= zone.color_code %>></td>
+      <td><%= image_tag zone.texture.url(:thumb) %></td>
+      <td><%= link_to 'Edit Z', edit_zone_path(zone), :class => 'btn btn-primary', data: {toggle: 'modal', target: 'editZoneModal', remote: true } %>
 
+
+      </td>
       <td><%= link_to 'Edit', edit_zone_path(zone), :class => 'btn btn-primary' %></td>
       <td><%= link_to 'Delete', zone, method: :delete, data: { confirm: 'Are you sure?' }, :class => 'btn btn-primary' %></td>
     </tr>
     <% end %>
   </tbody>
 </table>
+
+
 
 <%= link_to 'Add New Zone', new_zone_path %>
