@@ -64,37 +64,6 @@ $ ->
     if $("body.home").length
       loadPlansOnly()
 
-  zoneEditor = ->
-    mapOptions =
-      center: new google.maps.LatLng(-34.397, 150.644),
-      zoom: 8
-
-    map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions)
-
-    drawingManager = new google.maps.drawing.DrawingManager(
-      drawingMode: google.maps.drawing.OverlayType.MARKER
-      drawingControl: true
-      drawingControlOptions:
-        position: google.maps.ControlPosition.TOP_CENTER
-        drawingModes: [
-          google.maps.drawing.OverlayType.MARKER,
-
-          google.maps.drawing.OverlayType.POLYGON,
-          google.maps.drawing.OverlayType.POLYLINE
-        ]
-
-      markerOptions:
-        icon: 'images/beachflag.png'
-
-      circleOptions:
-        fillColor: '#ffff00'
-        fillOpacity: 1
-        strokeWeight: 5
-        clickable: false
-        editable: true
-        zIndex: 1
-    )
-    drawingManager.setMap map
 
 
   loadCustomPolygons = (planid) ->
@@ -125,37 +94,59 @@ $ ->
         planid = data[i].id
         name = data[i].name
         vertices = []
+        center = centerMap(data[i].polygons)
+
         for polygon in data[i].polygons
           polygonid = polygon.id
           if polygon.polygontype == "planmap"
             for vertex in polygon.vertices
               vertices.push new google.maps.LatLng(vertex.lat, vertex.lng)
-          polygon = new google.maps.Polygon
-            editable: false,
-            paths: vertices,
-            strokeWeight: 0.5,
-            fillColor: '#888888',
-            fillOpacity: 1,
-            id: polygonid,
-            planid: planid,
+
+          marker = new google.maps.Marker
+            position: new google.maps.LatLng(center[0], center[1])
+            map: map
+            id: polygonid
+            planid: planid
             name: name
 
+          polygon = new google.maps.Polygon
+            editable: false
+            paths: vertices
+            strokeWeight: 0.5
+            fillColor: '#ffff00'
+            fillOpacity: 0.5
+            id: polygonid
+            planid: planid
+            name: name
+
+          marker.setMap(map)
           polygon.setMap(map)
           google.maps.event.addListener(polygon, 'click', showInfo)
+          google.maps.event.addListener(marker, 'click', showInfo)
           infoWindow = new google.maps.InfoWindow()
 
-  centerMap = (polygons) ->
-    for polygon in polygons
-      if polygon.polygontype == "planmap"
-        vertices = polygon.vertices
-        lats = vertices.map (vertex) ->
-          vertex.lat
-        lngs = vertices.map (vertex) ->
-          vertex.lng
-        lats_avg = (lats.reduce (t, s) -> t + s) / lats.length
-        lngs_avg = (lngs.reduce (t, s) -> t + s) / lngs.length
-    [lats_avg, lngs_avg]
+  showInfo = (event) ->
 
+    id = this.id
+    planid = this.planid
+    name = this.name
+
+#    paths = this.getPath().getArray()
+
+    google.maps.event.addListener(infoWindow, 'domready', ->
+      $('#modify').click ->
+        alert "hey"
+        console.log id
+        )
+
+    content = "<a href='plans/#{planid}'>#{name}</a>"
+    # content_end = "<br><form id='modifypolygon' action='plans/modifypolygon' method='post'>
+    # <input type='hidden' name='id' value='#{id}'>
+    # <input type='hidden' name='paths' value=' " + paths + " '><button>Submit</button><br>
+    # <a id='modify'>Modify</a>"
+    infoWindow.setContent(content)
+    infoWindow.setPosition(event.latLng)
+    infoWindow.open(map)
 
 
   DrawZonesTest = (planid) ->
@@ -195,6 +186,7 @@ $ ->
           strokeWeight: 1
           clickable: true
           editable: true
+          planid: planid
           zIndex: 1
       )
       drawingManager.setMap map
@@ -214,10 +206,30 @@ $ ->
           fillOpacity: 0.5,
           id: polygon.id,
           description: polygon.description
+          planid: planid
         polygon.setMap(map)
         addDeleteButton(polygon, 'http://i.imgur.com/RUrKV.png')
         google.maps.event.addListener(polygon, 'click', showZoneEdit)
         infoWindow = new google.maps.InfoWindow()
+
+
+      google.maps.event.addListener drawingManager, "overlaycomplete", (event) ->
+        overlayClickListener(event.overlay, planid)
+        #$('#vertices').val(event.overlay.getPath().getArray())
+        console.log event.overlay.getPath().getArray()
+
+  overlayClickListener = (overlay, planid) ->
+    google.maps.event.addListener overlay, "mouseup", (event) ->
+        #$('#vertices').val(overlay.getPath().getArray())
+
+        addDeleteButton(overlay, 'http://i.imgur.com/RUrKV.png')
+        google.maps.event.addListener(overlay, 'click', showZoneEdit)
+        #console.log overlay.getPath().getArray()
+        console.log event.latLng
+        if google.maps.geometry.poly.isLocationOnEdge(event.latLng, overlay)
+          console.log true
+        #console.log event.vertex.lng
+
 
   addDeleteButton = (polygon, imageUrl) ->
     path = polygon.getPath()
@@ -274,13 +286,25 @@ $ ->
     id = this.id
     planid = this.planid
     name = this.name
-    description = this.description
-    paths = this.getPath().getArray()
-    console.log id
+    selectbox = ""
+    for id of zones
+      selectbox += "<option value=#{id}>#{zones[id].description}</option>"
 
-    content = "Description <input name='description' type='text' value='#{description}'>
-               <br>Polygon Type: <select name='polygontype'><option value='planmap'>Plan</option><option value='zone'>Zone</option></select>"
-    console.log event.latLng.lat() + " " + event.latLng.lng()
+    if this.description is undefined
+      description = ""
+    else
+      description = this.description
+    paths = this.getPath().getArray()
+    #console.log id
+
+    content = "<form action='/plans/modifypolygon' method='post'>Polygon Type: <select name='polygontype'><option value='planmap'>Plan</option>
+               <option value='zone'>Zone</option></select>
+               <br><input name='paths' type='hidden' value='#{paths}'>
+               <br><input name='planid' type='text' value='#{planid}'>
+               <br>Zone Type: <select name='zoneid'>" + selectbox + "</select>
+               <br>Description: <input name='description' type='text' value='#{description}'>
+               <br><input type='submit' value='submit'></form>"
+    #console.log event.latLng.lat() + " " + event.latLng.lng()
     infoWindow.setContent(content)
     infoWindow.setPosition(event.latLng)
     infoWindow.open(map)
@@ -345,31 +369,7 @@ $ ->
 
 
 
-  showInfo = (event) ->
 
-    # console.log event
-    console.log this.id
-    id = this.id
-    planid = this.planid
-    name = this.name
-
-    paths = this.getPath().getArray()
-
-    google.maps.event.addListener(infoWindow, 'domready', ->
-      $('#modify').click ->
-        alert "hey"
-        console.log id
-        )
-
-    content = "<a href='plans/#{planid}'>#{name}</a> #{id}"
-    content_end = "<br><form id='modifypolygon' action='plans/modifypolygon' method='post'>
-    <input type='hidden' name='id' value='#{id}'>
-    <input type='hidden' name='paths' value=' " + paths + " '><button>Submit</button><br>
-    <a id='modify'>Modify</a>"
-    infoWindow.setContent(content)
-        # infoWindow.setContent(content + content_end)
-    infoWindow.setPosition(event.latLng)
-    infoWindow.open(map)
 
   showZoneInfo = (event) ->
 
@@ -421,6 +421,21 @@ $ ->
                 position: results[0].geometry.location
         else
             alert "geocode not successful"
+
+centerMap = (polygons) ->
+  for polygon in polygons
+
+    if polygon.polygontype == "planmap"
+
+      vertices = polygon.vertices
+      lats = vertices.map (vertex) ->
+        vertex.lat
+      lngs = vertices.map (vertex) ->
+        vertex.lng
+      lats_avg = (lats.reduce (t, s) -> t + s) / lats.length
+      lngs_avg = (lngs.reduce (t, s) -> t + s) / lngs.length
+
+  [lats_avg, lngs_avg]
 
 zoneTypes = ->
 

@@ -54,19 +54,30 @@ class PlansController < ApplicationController
   end
 
   def modifypolygon
-    id = params[:id]
+    if params[:id].blank?
+      polygon = Polygon.new(plan_id: params[:planid], polygontype: params[:polygontype], zone_id: params[:zoneid], description: params[:description])
+      polygon.save
+      id = polygon.id
+    else
+      id = params[:id]
+      oldpolygons = Vertex.where(polygon_id: id)
+      oldpolygons.each do |oldpolygon|
+        oldpolygon.todelete = true
+        oldpolygon.save
+      end
+      polygon = Polygon.find(id)
+      polygon.polygontype = params[:polygontype]
+      polygon.zone_id = params[:zoneid]
+      polygon.description = params[:description]
+      polygon.save
+
+    end
+
     paths = params[:paths]
 
     paths = paths.strip
     paths = paths[1..paths.length - 2]
     @paths = paths.split("),(")
-    # puts @paths
-    oldpolygons = Vertex.where(polygon_id: id)
-
-    oldpolygons.each do |oldpolygon|
-      oldpolygon.todelete = true
-      oldpolygon.save
-    end
 
     @paths.each do |cord|
       cord = cord.split(", ")
