@@ -85,7 +85,7 @@ class PlansController < ApplicationController
       Vertex.create(polygon_id: id, lat: cord[0], lng: cord[1], todelete: false)
 
     end
-
+    redirect_to :back
 
 
   end
