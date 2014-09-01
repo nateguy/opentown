@@ -25,9 +25,7 @@ $ ->
   initializeMap = ->
 
     geocoder = new google.maps.Geocoder()
-    imageBounds = new google.maps.LatLngBounds(
-      new google.maps.LatLng(22.294193,113.946973)
-      new google.maps.LatLng(22.305817,113.966819))
+
     # latlng = new google.maps.LatLng(22.297256, 113.948430)
     # mapOptions =
     #   center: latlng,
@@ -159,12 +157,17 @@ $ ->
 
     response.done (data) ->
 
+      imageBounds = new google.maps.LatLngBounds(
+        new google.maps.LatLng(22.294193,113.946973)
+        new google.maps.LatLng(22.305817,113.966819))
       center = centerMap(data.polygons)
       latlng = new google.maps.LatLng(center[0], center[1])
       mapOptions =
         center: latlng,
         zoom: 15
       map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions)
+
+
 
       drawingManager = new google.maps.drawing.DrawingManager(
         drawingMode: google.maps.drawing.OverlayType.MARKER
@@ -191,6 +194,11 @@ $ ->
           zIndex: 1
       )
       drawingManager.setMap map
+
+      newOverlay = new google.maps.GroundOverlay(
+        '/plan/tungchung_cropped.jpg',
+        imageBounds)
+      newOverlay.setMap(map)
 
       for polygon in data.polygons
         vertices = []
@@ -285,7 +293,7 @@ $ ->
 
 
     id = this.id
-
+    description = this.description
     #polygon id
     console.log "polygon id " + id
     planid = this.planid
@@ -294,8 +302,9 @@ $ ->
 
     if this.description is undefined
       description = ""
-    else
-      description = this.description
+    if id is undefined
+      id = ""
+
     paths = this.getPath().getArray()
     #console.log id
 
