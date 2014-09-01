@@ -37,6 +37,12 @@ li.plan_id {
     display: block;
   }
 
+  .sidebar-nav .navbar li:hover {
+    float: none;
+    display: block;
+    background-color: #999999;
+  }
+
   .sidebar-nav .navbar li a {
     padding-top: 12px;
     padding-bottom: 12px;
@@ -44,6 +50,9 @@ li.plan_id {
 
 }
 
+.planform .row {
+  margin-bottom: 10px;
+}
 
 #like_div form {
   display: inline;

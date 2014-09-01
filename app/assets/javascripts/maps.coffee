@@ -11,6 +11,7 @@ centerpoint = null
 polygon = []
 polygonVertices = {}
 zones = {}
+lastZone = null
 
 $ ->
 
@@ -139,7 +140,7 @@ $ ->
         console.log id
         )
 
-    content = "<a href='plans/#{planid}'>#{name}</a>"
+    content = "<h4><a href='plans/#{planid}'>#{name}</a></h4>"
     # content_end = "<br><form id='modifypolygon' action='plans/modifypolygon' method='post'>
     # <input type='hidden' name='id' value='#{id}'>
     # <input type='hidden' name='paths' value=' " + paths + " '><button>Submit</button><br>
@@ -284,11 +285,12 @@ $ ->
 
 
     id = this.id
+
+    #polygon id
+    console.log "polygon id " + id
     planid = this.planid
     name = this.name
-    selectbox = ""
-    for id of zones
-      selectbox += "<option value=#{id}>#{zones[id].description}</option>"
+
 
     if this.description is undefined
       description = ""
@@ -301,7 +303,8 @@ $ ->
                <option value='zone'>Zone</option></select>
                <br><input name='paths' type='hidden' value='#{paths}'>
                <br><input name='planid' type='text' value='#{planid}'>
-               <br>Zone Type: <select name='zoneid'>" + selectbox + "</select>
+               <br><input name='id' type='text' value='#{id}'>
+               <br>Zone Type: <select name='zoneid'>" + getZonesSelectBox() + "</select>
                <br>Description: <input name='description' type='text' value='#{description}'>
                <br><input type='submit' value='submit'></form>"
     #console.log event.latLng.lat() + " " + event.latLng.lng()
@@ -356,6 +359,7 @@ $ ->
           editable: editable
           paths: vertices,
           strokeWeight: 0.5,
+          zoneid: zoneid,
           fillColor: zones[zoneid].color_code,
           fillOpacity: 1,
           id: polygon.id,
@@ -367,32 +371,37 @@ $ ->
         infoWindow = new google.maps.InfoWindow()
 
 
-
-
+  getZonesSelectBox = ->
+    selectbox = ""
+    for id of zones
+      selectbox += "<option value=#{id}>#{zones[id].description}</option>"
+    selectbox
 
   showZoneInfo = (event) ->
     console.log "clicked"
 
     id = this.id
+
+    zoneid = this.zoneid
     planid = this.planid
     name = this.name
     description = this.description
     paths = this.getPath().getArray()
-    console.log this
-    selectbox = ""
-    for id of zones
-      selectbox += "<option value=#{id}>#{zones[id].description}</option>"
+    $(".zone.#{lastZone}").css('background-color','')
+    $(".zone.#{lastZone} a").css('color','')
+    $(".zone.#{zoneid}").css('background-color','#880000')
+    $(".zone.#{zoneid} a").css('color','#ffffff')
+    lastZone = zoneid
 
-
-    changeform = "Change this zone: <form action='/plans/userplan/newzone/' method='post'>Polygon:
-    <input type='text' value='#{this.id}' name='polygonid'>
-      <br>Change to: <select name='zoneid'>" + selectbox + "</select><br>
-
-      <input type='submit' value='submit'></form>"
+    heading = "InfoBox"
+    content = "<h4>" + description + "</h4>"
     if $("body.plans.userplan").length
-      infoWindow.setContent(description + "<br>" + changeform)
-    else
-      infoWindow.setContent(description)
+      content =+ "<br>Change this zone: <form action='/plans/userplan/newzone/' method='post'>Polygon:
+      <input type='text' value='#{this.id}' name='polygonid'>
+      <br>Change to: <select name='zoneid'>" + getZonesSelectBox() + "</select><br>
+      <input type='submit' value='submit'></form>"
+
+    infoWindow.setContent(heading + content)
     infoWindow.setPosition(event.latLng)
     infoWindow.open(map)
 

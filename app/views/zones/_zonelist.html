@@ -16,7 +16,7 @@
       <ul class="nav navbar-nav">
 
     <% @zones.each do |zone| %>
-        <li class="zone" data-id=<%= zone.id %> data-code=<%= zone.code %> data-color=<%= zone.color_code %> ><a><div class="legendbox" style="background-color:<%= zone.color_code %>"></div><%= zone.classification %></a> </li>
+        <li class="zone <%= zone.id %>" data-id=<%= zone.id %> data-code=<%= zone.code %> data-color=<%= zone.color_code %> ><a><div class="legendbox" style="background-color:<%= zone.color_code %>"></div><%= zone.classification %></a> </li>
     <% end %>
 
 
