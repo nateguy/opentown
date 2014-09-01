@@ -2,8 +2,25 @@
 
 <h1>Edit Plan</h1>
 
-<%= render 'planform' %>
-<%= render 'planmapeditor' %>
+  <div class="span12 case-menu">
+    <div id="plantabs" class="btn-group" data-toggle="btns">
+      <a class="btn btn-default" href="#background" data-toggle="tab">Background Info</a>
+      <a class="btn btn-default active" href="#odp" data-toggle="tab">Plan Layout</a>
+
+
+    </div>
+  </div>
+
+  <div class="tab-content">
+    <div class="tab-pane" id="background">
+        <%= render 'planform' %>
+    </div>
+    <div class="tab-pane active" id="odp">
+        <%= render 'planmapeditor' %>
+    </div>
+
+  </div>
+
 
 <%= link_to 'Show', @plan %> |
 <%= link_to 'Back', zones_path %>

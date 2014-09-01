@@ -1,0 +1,29 @@
+<div class="sidebar-nav">
+  <div class="navbar navbar-default" role="navigation">
+
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".sidebar-navbar-collapse">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <span class="visible-xs navbar-brand">Zone List</span>
+    </div>
+
+    <div class="navbar-collapse collapse sidebar-navbar-collapse zone_sidebar">
+
+      <ul class="nav navbar-nav">
+
+    <% @zones.each do |zone| %>
+        <li class="zone" data-id=<%= zone.id %> data-code=<%= zone.code %> data-color=<%= zone.color_code %> ><a><div class="legendbox" style="background-color:<%= zone.color_code %>"></div><%= zone.classification %></a> </li>
+    <% end %>
+
+
+
+
+
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div>
+</div>

@@ -344,7 +344,6 @@ $ ->
           zoneid = polygon.zone_id
           description = polygon.description
 
-
         for vertex in polygon.vertices
           vertices.push new google.maps.LatLng(vertex.lat, vertex.lng)
 
@@ -372,7 +371,7 @@ $ ->
 
 
   showZoneInfo = (event) ->
-
+    console.log "clicked"
 
     id = this.id
     planid = this.planid
