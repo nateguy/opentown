@@ -1,29 +1,60 @@
+<div class="zonesform">
+  <%= form_for(@zone) do |f| %>
+    <div class="row">
+      <div class="form-group">
+        <%= f.label :code, class: "col-md-4 control-label" %>
+        <div class="col-md-8">
+        <%= f.text_field :code, class: "form-control"  %>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="form-group">
+          <%= f.label :description, class: "col-md-4 control-label" %>
+        <div class="col-md-8">
+          <%= f.text_field :description, class: "form-control" %>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="form-group">
+        <%= f.label :classification, class: "col-md-4 control-label" %>
+        <div class="col-md-8">
+        <%= f.text_field :classification, class: "form-control" %>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="form-group">
+        <%= f.label :color_code, class: "col-md-4 control-label" %>
+        <div class="col-md-8">
+        <%= f.color_field :color_code, class: "form-control" %>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="form-group">
+        <%= f.label :texture, class: "col-md-4 control-label" %>
+        <div class="col-md-8">
+        <%= f.file_field :texture, class: "form-control" %>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="form-group">
+        <%= f.label 'Current Texture', class: "col-md-4 control-label" %>
+        <%= image_tag @zone.texture.url(:thumb) %>
+      </div>
+    </div>
 
-  <%= form_for(@zone, url: zone_path) do |f| %>
-    fdsfdsfds
-    <div class="field">
-      <%= f.label :code %>
-      <%= f.text_field :code %>
-    </div>
-    <div class="field">
-      <%= f.label :description %>
-      <%= f.text_field :description %>
-    </div>
-    <div class="field">
-      <%= f.label :classification %>
-      <%= f.text_field :classification %>
-    </div>
-    <div class="field">
-      <%= f.label :color_code %>
-      <%= f.color_field :color_code %>
-    </div>
-    <div class="field">
-      <%= image_tag @zone.texture.url(:thumb) %>
-      <%= f.label :texture %>
-      <%= f.file_field :texture %>
-    </div>
 
+
+  <div class="row">
     <div class="actions">
-      <%= f.submit %>
+      <div class="col-md-8">
+        <%= f.submit "Submit", class: "btn btn-default btn-primary" %>
+      </div>
     </div>
+  </div>
   <% end %>
+</div>

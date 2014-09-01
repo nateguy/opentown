@@ -1,19 +1,39 @@
+<div class="planform">
+  <%= form_for(@plan) do |f| %>
+  <div class="row">
+    <div class="form-group">
 
-<%= form_for(@plan) do |f| %>
+        <%= f.label :name, class: "col-md-4 control-label"  %>
 
-  <div class="field">
-    <%= f.label :name %>
-    <%= f.text_field :name %>
+      <div class="col-md-8">
+        <%= f.text_field :name, class: "form-control" %>
+      </div>
+    </div>
   </div>
-  <div class="field">
-    <%= f.label :district %>
-    <%= f.text_field :district %>
+  <div class="row">
+    <div class="form-group">
+        <%= f.label :district, class: "col-md-4 control-label"  %>
+      <div class="col-md-8">
+        <%= f.text_field :district, class: "form-control" %>
+      </div>
+    </div>
   </div>
-  <div class="background">
-    <%= f.label :content %>
-    <%= f.text_field :content %>
+  <div class="row">
+    <div class="form-group">
+
+        <%= f.label :content, class: "col-md-4 control-label"  %>
+
+      <div class="col-md-8">
+        <%= f.text_area :content, class: "form-control" %>
+      </div>
+    </div>
   </div>
-  <div class="actions">
-    <%= f.submit %>
+  <div class="row">
+    <div class="actions">
+      <div class="col-md-8">
+        <%= f.submit "Submit", class: "btn btn-default btn-primary" %>
+      </div>
+    </div>
   </div>
-<% end %>
+  <% end %>
+</div>

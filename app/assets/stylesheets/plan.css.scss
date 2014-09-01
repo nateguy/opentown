@@ -6,6 +6,12 @@ li.plan_id {
   display: none;
 }
 
+.planform {
+  textarea.form-control {
+    height: 150px;
+  }
+}
+
 .col-sm-3.zone_sidebar {
   padding-left: 0;
   padding-right: 0;
