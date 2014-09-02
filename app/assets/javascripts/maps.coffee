@@ -429,6 +429,7 @@ $ ->
 
   showZoneInfo = (event) ->
 
+
     id = this.id
     zoneid = this.zoneid
     planid = this.planid
@@ -444,7 +445,7 @@ $ ->
     heading = "InfoBox"
     content = "<h4>" + description + "</h4>"
     if $("body.plans.userplan").length
-      content = content + "<br>Change this zone: <form action='/plans/userplan/newzone/' method='post'>Polygon:
+      content = content + "<div id='infoBoxDrop'>Drop here</div>Change this zone: <form action='/plans/userplan/newzone/' method='post'>Polygon:
       <input type='text' value='#{this.id}' name='polygonid'>
       <br>Change to: <select name='zoneid'>" + getZonesSelectBox() + "</select><br>
       <input type='submit' value='submit'></form>"
@@ -453,6 +454,22 @@ $ ->
     infoWindow.setPosition(event.latLng)
     infoWindow.open(map)
 
+    infoBoxDrop = document.getElementById("infoBoxDrop")
+    infoBoxDrop.addEventListener('dragover' , (e) ->
+      e.preventDefault()
+      false
+    )
+    infoBoxDrop.addEventListener('drop', (e) ->
+      console.log "dropped " + e.dataTransfer.getData("text/plain")
+      e.preventDefault()
+      false
+    )
+
+    drop = (event) ->
+      event.preventDefault()
+      console.log "dragged"
+      this.innerHTML = "dropped" + e.dataTransfer.getData("text/plain")
+      false
 
   # PlanOverlay.prototype = new google.maps.OverlayView()
   google.maps.event.addDomListener(window, 'load', initializeMap)

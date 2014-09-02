@@ -5,12 +5,15 @@
 <% @user_polygons.each do |polygon| %>
   <li class="user_polygon" data-polygon=<%= polygon.polygon_id %> data-zone=<%= polygon.custom_zone %> data-description='<%= polygon.custom_description %>'></li>
 <% end %>
+
   <div class="row">
 
-    <div id="map-canvas"/></div>
-  </div>
-  <div class="row">
-    <% @zones.each do |zone| %>
-        <li class="zone" data-id=<%= zone.id %> data-code=<%= zone.code %> data-color=<%= zone.color_code %> > <div class="legendbox" style="background-color:<%= zone.color_code %>"></div><%= zone.classification %> </li>
-    <% end %>
-  </div>
+    <div class="col-sm-9">
+      <div id="map-canvas"/></div>
+    </div>
+    <div class="col-sm-3 zone_sidebar">
+
+      <%= render partial: 'zones/zonelist' %>
+
+    </div>
+</div>
