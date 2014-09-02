@@ -2,6 +2,13 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
+
+ul.nav.navbar-nav.navbar-right {
+  li:hover {
+    background-color: #999999;
+  }
+}
+
 li.plan_id {
   display: none;
 }

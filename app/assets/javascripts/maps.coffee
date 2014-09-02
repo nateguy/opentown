@@ -442,13 +442,20 @@ $ ->
     $(".zone.#{zoneid} a").css('color','#ffffff')
     lastZone = zoneid
 
-    heading = "InfoBox"
-    content = "<h4>" + description + "</h4>"
+    heading = "Information:"
+    content = "<h5>" + description + "</h5>"
     if $("body.plans.userplan").length
-      content = content + "<div id='infoBoxDrop'>Drop here</div>Change this zone: <form action='/plans/userplan/newzone/' method='post'>Polygon:
-      <input type='text' value='#{this.id}' name='polygonid'>
-      <br>Change to: <select name='zoneid'>" + getZonesSelectBox() + "</select><br>
-      <input type='submit' value='submit'></form>"
+      content = content + "<div class='row'><div id='infoBoxDrop'><h4>Drop Custom Zone here</h4></div></div>
+      <form action='/plans/userplan/newzone/' method='post'>
+      <div class='row'>
+        <div class='form-group'><textarea placeholder='Describe what should go here instead' name='description' rows='2' class='form-control'></textarea>
+        </div>
+      </div>
+      <input type='hidden' name='zoneid'>
+      <input type='hidden' value='#{this.id}' name='polygonid'>
+      <div class='row'><div class='form-group'>
+      <input type='submit' class='btn btn-primary btn-sm' value='submit'></form>
+      </div></div>"
 
     infoWindow.setContent(heading + content)
     infoWindow.setPosition(event.latLng)
@@ -460,7 +467,11 @@ $ ->
       false
     )
     infoBoxDrop.addEventListener('drop', (e) ->
-      console.log "dropped " + e.dataTransfer.getData("text/plain")
+      console.log "dropped "
+      newzone = e.dataTransfer.getData("text/plain")
+      $("input[name='zoneid']").val(newzone)
+      $("#infoBoxDrop").html("<div class='legendbox' style='background-color:" + zones[newzone].color_code + "'></div>
+        <h5>" + zones[newzone].classification + "</h5>")
       e.preventDefault()
       false
     )

@@ -120,18 +120,15 @@ class PlansController < ApplicationController
       user_polygon = nil
       polygonid = params[:polygonid]
       zoneid = params[:zoneid]
-
-
-
-
+      description = params[:description]
 
       if @user_polygons.exists?(polygon_id: polygonid)
         user_polygon = @user_polygons.find_by(polygon_id: polygonid)
         user_polygon.user_id = User.current.id
         user_polygon.custom_zone = zoneid
-
+        user_polygon.custom_description = description
       else
-        user_polygon = UserPolygon.new(polygon_id: polygonid, user_id: User.current.id, custom_zone: zoneid)
+        user_polygon = UserPolygon.new(polygon_id: polygonid, user_id: User.current.id, custom_description: description, custom_zone: zoneid)
       end
 
       if user_polygon.save
