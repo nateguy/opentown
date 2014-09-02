@@ -8,6 +8,7 @@ class PlansController < ApplicationController
 
   def new
     @plan = Plan.new
+
   end
 
   def show
@@ -25,6 +26,16 @@ class PlansController < ApplicationController
         format.json { render json: @plan.errors, status: :unprocessable_entity }
       end
     end
+  end
+
+  def update_bounds
+    @plan = Plan.find(params[:id])
+    @plan.sw_lng = params[:sw_lng]
+    @plan.sw_lat = params[:sw_lat]
+    @plan.ne_lng = params[:ne_lng]
+    @plan.ne_lat = params[:ne_lat]
+    @plan.save
+    redirect_to :back
   end
 
   def destroy

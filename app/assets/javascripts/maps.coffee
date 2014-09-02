@@ -177,6 +177,7 @@ $ ->
     polygon
 
 
+
   DrawZonesTest = (planid) ->
 
     response = $.ajax(
@@ -234,11 +235,47 @@ $ ->
           zIndex: 1
       )
       drawingManager.setMap map
+      console.log imageBounds
 
       control = drawControl(map, imageBounds)
       window.img = data.overlay
+      overlayImage = new Image()
+      overlayImage.src = data.overlay
+      overlayImage.width
+      overlayImage.height
       window.overlay = drawGroundOverlay(map, window.img, imageBounds)
+      console.log window.overlay
       google.maps.event.addListener(control, 'bounds_changed', boundsChangedHandler)
+      google.maps.event.addListener(control, 'rightclick', (e) ->
+
+        width = (data.ne_lat - data.sw_lat)
+        height = width * (overlayImage.height / overlayImage.width)
+
+        center_lng = (data.sw_lng + data.ne_lng) / 2
+        new_sw_lng = center_lng - (height / 2)
+        new_ne_lng = center_lng + (height / 2)
+
+        imageBounds = new google.maps.LatLngBounds(
+          new google.maps.LatLng(data.sw_lat,new_sw_lng)
+          new google.maps.LatLng(data.ne_lat,new_ne_lng))
+        this.bounds = imageBounds
+      )
+
+      google.maps.event.addListener(control, 'click', (e) ->
+        infoWindow.close()
+        infoWindow = new google.maps.InfoWindow()
+
+        resize = "<a id='setProportion'>Hey</a>"
+        content = "Save new bounds: <form action='/plans/update_bounds' method='post'><input name='sw_lat' type='text' value='#{this.getBounds().getSouthWest().lat()}'>
+                  <input name='id' value='#{planid}' type='text'>
+                  <input name='sw_lng' type='text' value='#{this.getBounds().getSouthWest().lng()}'>
+                  <input name='ne_lat' type='text' value='#{this.getBounds().getNorthEast().lat()}'>
+                  <input name='ne_lng' type='text' value='#{this.getBounds().getNorthEast().lng()}'>
+                  <input type='submit'></form>"
+        infoWindow.setContent(resize + content)
+        infoWindow.setPosition(e.latLng)
+        infoWindow.open(map)
+        )
       # newOverlay = new google.maps.GroundOverlay(
       #   '/plan/tungchung_cropped.jpg',
       #   imageBounds)
@@ -267,6 +304,7 @@ $ ->
         if google.maps.geometry.poly.isLocationOnEdge(event.latLng, overlay)
           console.log true
         #console.log event.vertex.lng
+
 
 
   addDeleteButton = (polygon, imageUrl) ->
@@ -432,6 +470,8 @@ $ ->
   $("#lockOverlay").click ->
     addOverlay()
 
+  $("#setProportion").click ->
+    alert "hey"
 
   $("#btn_address").click ->
     address = $("#address").val()
@@ -462,6 +502,7 @@ drawControl = (map, bounds) ->
     fillOpacity: 0.0,
     draggable: true,
     editable: true
+    clickable: true
 
 drawGroundOverlay = (map, url, bounds) ->
   options =

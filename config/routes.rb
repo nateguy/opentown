@@ -16,7 +16,7 @@ Rails.application.routes.draw do
   post 'plans/userplan/:id' => 'plans#newuserzone'
   post 'plans/modifypolygon' => 'plans#modifypolygon'
   get 'plans/all' => 'plans#showall'
-
+  post 'plans/update_bounds' => 'plans#update_bounds'
 
   resources :zones
   resources :plans
