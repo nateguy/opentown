@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140831020306) do
+ActiveRecord::Schema.define(version: 20140902082437) do
 
   create_table "comments", force: true do |t|
     t.integer  "user_id"
@@ -36,6 +36,14 @@ ActiveRecord::Schema.define(version: 20140831020306) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.binary   "content"
+    t.string   "overlay_file_name"
+    t.string   "overlay_content_type"
+    t.integer  "overlay_file_size"
+    t.datetime "overlay_updated_at"
+    t.float    "sw_lat"
+    t.float    "sw_lng"
+    t.float    "ne_lat"
+    t.float    "ne_lng"
   end
 
   create_table "polygons", force: true do |t|

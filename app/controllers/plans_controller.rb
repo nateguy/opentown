@@ -15,6 +15,18 @@ class PlansController < ApplicationController
 
   end
 
+  def update
+    respond_to do |format|
+      if @plan.update(plan_params)
+        format.html { redirect_to plans_url, notice: 'Plan was successfully updated.' }
+        format.json { render :show, status: :ok, location: @plan }
+      else
+        format.html { render :edit }
+        format.json { render json: @plan.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
   def destroy
     @plan.destroy
     respond_to do |format|
@@ -169,7 +181,7 @@ class PlansController < ApplicationController
     end
 
     def plan_params
-      params.require(:plan).permit(:name, :district, :content)
+      params.require(:plan).permit(:name, :district, :content, :overlay, :sw_lat, :sw_lng, :ne_lat, :ne_lng)
     end
 
 end

@@ -14,7 +14,7 @@ newOverlay = null
 window.overlay = undefined
 window.img = ''
 rectangle = null
-
+#default_latlng = new google.maps.LatLng(22.294193,113.946973)
 
 $ ->
 
@@ -45,7 +45,30 @@ $ ->
     if $("body.home").length
       loadPlansOnly()
 
+    if $("body.plans.new").length
+      loadBlankMap()
 
+
+
+
+  loadBlankMap = ->
+    latlng = new google.maps.LatLng(22.297256, 113.948430)
+    mapOptions =
+      center: latlng,
+      zoom: 15
+    map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions)
+    marker = new google.maps.Marker
+    google.maps.event.addListener(map, 'bounds_changed', ->
+      $("#plan_sw_lat").val(map.getBounds().getSouthWest().lat())
+      $("#plan_sw_lng").val(map.getBounds().getSouthWest().lng())
+      $("#plan_ne_lat").val(map.getBounds().getNorthEast().lat())
+      $("#plan_ne_lng").val(map.getBounds().getNorthEast().lng())
+
+      $("#new_plan_coordinates").html(map.getCenter().lat() + " " + map.getCenter().lng())
+
+
+      )
+        #alert map.getCenter();
 
   loadCustomPolygons = (planid) ->
     customPolygons = {}
@@ -80,7 +103,7 @@ $ ->
         for polygon in data[i].polygons
 
           if polygon.polygontype == "planmap"
-            drawPolygon(polygon, false, planid)
+            polygon = drawPolygon(polygon, false, planid)
 
             marker = new google.maps.Marker
               position: new google.maps.LatLng(center[0], center[1])
@@ -89,15 +112,14 @@ $ ->
               planid: planid
               name: name
 
-
-
             marker.setMap(map)
-
+            polygon.name = name
+            google.maps.event.addListener(polygon, 'click', showInfo)
             google.maps.event.addListener(marker, 'click', showInfo)
-            #infoWindow = new google.maps.InfoWindow()
+
 
   showInfo = (event) ->
-
+    console.log "shoew"
     id = this.id
     planid = this.planid
     name = this.name
@@ -144,13 +166,15 @@ $ ->
       id: polygon.id,
       description: polygon.description
       planid: planid
-      name: name
+      name: polygon.name
     polygon.setMap(map)
+    infoWindow = new google.maps.InfoWindow()
     if editable is true
       setEditable(polygon)
     else
       setNotEditable(polygon)
-    infoWindow = new google.maps.InfoWindow()
+
+    polygon
 
 
   DrawZonesTest = (planid) ->
@@ -161,22 +185,32 @@ $ ->
       )
 
     response.done (data) ->
+      console.log "showing data"
+      console.log data
 
       imageBounds = new google.maps.LatLngBounds(
-        new google.maps.LatLng(22.294193,113.946973)
-        new google.maps.LatLng(22.305817,113.966819))
-      center = centerMap(data.polygons)
-      latlng = new google.maps.LatLng(center[0], center[1])
+        new google.maps.LatLng(data.sw_lat,data.sw_lng)
+        new google.maps.LatLng(data.ne_lat,data.ne_lng))
+      if data.polygons.length > 0
+        console.log "in polygons"
+        center = centerMap(data.polygons)
+        center_lng = center[1]
+        center_lat = center[0]
+        #latlng = new google.maps.LatLng(center[0], center[1])
+      else
+        center_lng = (data.ne_lng + data.sw_lng) / 2
+        center_lat = (data.ne_lat + data.sw_lat) / 2
+        console.log "center_lng" + center_lng
+        console.log "center_lat" + center_lat
+
+      latlng = new google.maps.LatLng(center_lat,center_lng)
       mapOptions =
         center: latlng,
         zoom: 15
       map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions)
 
-
-
-
       drawingManager = new google.maps.drawing.DrawingManager(
-        drawingMode: google.maps.drawing.OverlayType.MARKER
+        drawingMode: google.maps.drawing.OverlayType.POLYGON
         drawingControl: true
         drawingControlOptions:
           position: google.maps.ControlPosition.TOP_CENTER
@@ -202,7 +236,7 @@ $ ->
       drawingManager.setMap map
 
       control = drawControl(map, imageBounds)
-      window.img = '/plan/tungchung_cropped.jpg'
+      window.img = data.overlay
       window.overlay = drawGroundOverlay(map, window.img, imageBounds)
       google.maps.event.addListener(control, 'bounds_changed', boundsChangedHandler)
       # newOverlay = new google.maps.GroundOverlay(
@@ -211,8 +245,11 @@ $ ->
       addOverlay()
       #newOverlay.setMap(map)
 
-      for polygon in data.polygons
-        drawPolygon(polygon, true, planid)
+      if data.polygons.length > 0
+        for polygon in data.polygons
+          drawPolygon(polygon, true, planid)
+      else
+        infoWindow = new google.maps.InfoWindow()
 
       google.maps.event.addListener drawingManager, "overlaycomplete", (event) ->
         overlayClickListener(event.overlay, planid)
@@ -300,19 +337,23 @@ $ ->
     paths = this.getPath().getArray()
     #console.log id
 
-    content = "<form action='/plans/modifypolygon' method='post'>Polygon Type: <select name='polygontype'><option value='planmap'>Plan</option>
-               <option value='zone'>Zone</option></select>
-               <br><input name='paths' type='hidden' value='#{paths}'>
-               <br><input name='planid' type='text' value='#{planid}'>
-               <br><input name='id' type='text' value='#{id}'>
-               <br>Zone Type: <select name='zoneid'>" + getZonesSelectBox() + "</select>
-               <br>Description: <input name='description' type='text' value='#{description}'>
-               <br><input type='submit' value='submit'></form>"
+    content = "<form action='/plans/modifypolygon' method='post'>
+                <div class='row'>Polygon Type:</div>
+                <div class='row'><select name='polygontype'>
+                <option value='planmap'>Plan</option>
+                <option value='zone'>Zone</option></select></div>
+                <input name='paths' type='hidden' value='#{paths}'>
+                <input name='planid' type='hidden' value='#{planid}'>
+                <input name='id' type='hidden' value='#{id}'>
+                <div class='row'>Zone Type:</div>
+                <div class='row'><select name='zoneid'>" + getZonesSelectBox() + "</select></div>
+                <div class='row'>Description:</div>
+                <div class='row'><input name='description' type='text' value='#{description}'></div>
+                <div class='row'><input type='submit' value='submit' class='btn btn-primary btn-sm'></div></form>"
     #console.log event.latLng.lat() + " " + event.latLng.lng()
     infoWindow.setContent(content)
     infoWindow.setPosition(event.latLng)
     infoWindow.open(map)
-
 
 
   loadAllZones = (planid, customPolygons) ->

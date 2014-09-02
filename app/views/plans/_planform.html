@@ -32,6 +32,26 @@
     </div>
   </div>
   <div class="row">
+
+    <div class="form-group">
+
+        <%= f.label :overlay, class: "col-md-2 control-label"  %>
+
+      <div class="col-md-10">
+        <%= f.file_field :overlay, class: "form-control" %>
+      </div>
+    </div>
+  </div>
+<div>
+<%= f.text_field :sw_lat %>
+<%= f.text_field :sw_lng %>
+<%= f.text_field :ne_lat %>
+<%= f.text_field :ne_lng %>
+
+
+
+</div>
+  <div class="row">
     <div class="actions">
       <div class="col-md-6">
         <%= f.submit "Submit", class: "btn btn-default btn-primary" %>
