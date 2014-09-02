@@ -108,7 +108,7 @@ class PlansController < ApplicationController
         user_polygon.custom_zone = zoneid
 
       else
-        user_polygon = UserPolygon.new(user_id: User.current.id, custom_zone: zoneid)
+        user_polygon = UserPolygon.new(polygon_id: polygonid, user_id: User.current.id, custom_zone: zoneid)
       end
 
       if user_polygon.save
