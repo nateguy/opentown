@@ -142,7 +142,7 @@ $ ->
     google.maps.event.addListener(polygon, 'click', showZoneEdit)
 
   setNotEditable = (polygon) ->
-
+    polygon.fillOpacity = 1
     polygon.editable = false
     if $("body.plans.stats").length
       google.maps.event.addListener(polygon, 'click', showZoneStats)
