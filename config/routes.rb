@@ -12,10 +12,12 @@ Rails.application.routes.draw do
 #  post 'plans/comment/:plan_id' => 'plans#comment'
 #  get 'plans/comments/' => 'plans#comments'
   get 'plans/odp/' => 'plans#odp'
+  get 'plans/user_polygons/' => 'plans#user_polygons'
   get 'plans/userplan/' => 'plans#userplan'
   post 'plans/userplan/:id' => 'plans#newuserzone'
   post 'plans/modifypolygon' => 'plans#modifypolygon'
   get 'plans/all' => 'plans#showall'
+  get 'plans/stats/' => 'plans#stats'
   post 'plans/update_bounds' => 'plans#update_bounds'
 
   resources :zones

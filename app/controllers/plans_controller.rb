@@ -11,6 +11,17 @@ class PlansController < ApplicationController
 
   end
 
+
+  def stats
+    @plan = Plan.find(params[:id])
+    @user_polygons = UserPolygon.all
+    @zones = Zone.all
+  end
+
+  def user_polygons
+    @user_polygons = UserPolygon.all
+  end
+
   def show
     response.headers["Vary"]= "Accept"
     @users = User.all

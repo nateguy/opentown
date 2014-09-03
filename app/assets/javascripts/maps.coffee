@@ -37,10 +37,15 @@ $ ->
       loadAllZones(planid)
 
     if $("body.plans.userplan").length
-
+      console.log "user plan"
       planid = $(".plan_id").data('planid')
       customPolygons = loadCustomPolygons(planid)
       loadAllZones(planid, customPolygons)
+
+    if $("body.plans.stats").length
+
+      planid = $(".plan_id").data('planid')
+      loadAllZones(planid)
 
     if $("body.home").length
       loadPlansOnly()
@@ -137,16 +142,20 @@ $ ->
     google.maps.event.addListener(polygon, 'click', showZoneEdit)
 
   setNotEditable = (polygon) ->
+
     polygon.editable = false
-    if !$("body.home").length
+    if $("body.plans.stats").length
+      google.maps.event.addListener(polygon, 'click', showZoneStats)
+    else
       google.maps.event.addListener(polygon, 'click', showZoneInfo)
+    #if !$("body.home").length
+    #  google.maps.event.addListener(polygon, 'click', showZoneInfo)
 
 
   drawPolygon = (polygon, editable, planid, customPolygons) ->
     vertices = []
 
     zoneid = polygon.zone_id
-    console.log zoneid
     description = polygon.description
     if customPolygons? and customPolygons[polygon.id]?
       console.log "there is a custompolygon"
@@ -169,6 +178,7 @@ $ ->
       name: polygon.name
     polygon.setMap(map)
     infoWindow = new google.maps.InfoWindow()
+    console.log "editable"
     if editable is true
       setEditable(polygon)
     else
@@ -282,6 +292,7 @@ $ ->
       addOverlay()
       #newOverlay.setMap(map)
 
+
       if data.polygons.length > 0
         for polygon in data.polygons
           drawPolygon(polygon, true, planid)
@@ -289,6 +300,7 @@ $ ->
         infoWindow = new google.maps.InfoWindow()
 
       google.maps.event.addListener drawingManager, "overlaycomplete", (event) ->
+
         overlayClickListener(event.overlay, planid)
         #$('#vertices').val(event.overlay.getPath().getArray())
         console.log event.overlay.getPath().getArray()
@@ -299,10 +311,10 @@ $ ->
 
         addDeleteButton(overlay, 'http://i.imgur.com/RUrKV.png')
         google.maps.event.addListener(overlay, 'click', showZoneEdit)
-        #console.log overlay.getPath().getArray()
-        console.log event.latLng
-        if google.maps.geometry.poly.isLocationOnEdge(event.latLng, overlay)
-          console.log true
+        #for polygon in polygons
+        #  console.log polygon
+        #  if google.maps.geometry.poly.isLocationOnEdge(event.latLng, polygon)
+        #    console.log "touching another polygon: " + true
         #console.log event.vertex.lng
 
 
@@ -426,9 +438,69 @@ $ ->
       selectbox += "<option value=#{id}>#{zones[id].description}</option>"
     selectbox
 
+  filterArray = (data, type, id) ->
+    if type == "polygon"
+      data = data.filter((polygon) ->
+          polygon.polygon_id == id
+          )
+    if type == "zone"
+      data = data.filter((polygon) ->
+          console.log "this: " + polygon.custom_zone + " " + id
+          console.log "this: " + (polygon.custom_zone == id)
+          polygon.custom_zone == id
+          )
+    return data
+
+  showZoneStats = (event) ->
+    zones
+    zones_users = {}
+    id = this.id
+    zoneid = this.zoneid
+    planid = this.planid
+    name = this.name
+    description = this.description
+    paths = this.getPath().getArray()
+
+    response = $.ajax(
+      url: '/plans/user_polygons'
+      dataType: 'json'
+      )
+
+    response.done (data) ->
+      zone_users = []
+
+      for zone of zones
+        zone = parseInt(zone)
+        zonePolygons = data.filter((polygon) ->
+          polygon.custom_zone == zone && polygon.polygon_id == id
+          )
+        if zonePolygons.length > 0
+
+          zone_users.push {zone_id: zone, size: zonePolygons.length }
+
+      zone_users = zone_users.sort((obj1, obj2) ->
+        obj2.size - obj1.size
+        )
+
+      console.log zone_users
+      content = "<table class='table table-striped'><tr><th>Zone Code</th><th>Users</th></tr>"
+
+      heading = "<h5>Proposed Alternatives</h5>"
+      for zone_user in zone_users
+        content = content + "<tr><td>#{zones[zone_user.zone_id].code}</td>
+        <td>#{zone_user.size}</td></tr>
+        </div>"
+      foot = "<table>"
+
+
+      infoWindow.setContent(heading + content + foot)
+      infoWindow.setPosition(event.latLng)
+      infoWindow.open(map)
+
+
   showZoneInfo = (event) ->
 
-
+    console.log "show zone info"
     id = this.id
     zoneid = this.zoneid
     planid = this.planid
@@ -460,26 +532,22 @@ $ ->
     infoWindow.setPosition(event.latLng)
     infoWindow.open(map)
 
-    infoBoxDrop = document.getElementById("infoBoxDrop")
-    infoBoxDrop.addEventListener('dragover' , (e) ->
-      e.preventDefault()
-      false
-    )
-    infoBoxDrop.addEventListener('drop', (e) ->
-      console.log "dropped "
-      newzone = e.dataTransfer.getData("text/plain")
-      $("input[name='zoneid']").val(newzone)
-      $("#infoBoxDrop").html("<div class='legendbox' style='background-color:" + zones[newzone].color_code + "'></div>
-        <h5>" + zones[newzone].classification + "</h5>")
-      e.preventDefault()
-      false
-    )
+    if $("body.plans.userplan").length
+      infoBoxDrop = document.getElementById("infoBoxDrop")
+      infoBoxDrop.addEventListener('dragover' , (e) ->
+        e.preventDefault()
+        false
+      )
+      infoBoxDrop.addEventListener('drop', (e) ->
+        console.log "dropped "
+        newzone = e.dataTransfer.getData("text/plain")
+        $("input[name='zoneid']").val(newzone)
+        $("#infoBoxDrop").html("<div class='legendbox' style='background-color:" + zones[newzone].color_code + "'></div>
+          <h5>" + zones[newzone].classification + "</h5>")
+        e.preventDefault()
+        false
+      )
 
-    drop = (event) ->
-      event.preventDefault()
-      console.log "dragged"
-      this.innerHTML = "dropped" + e.dataTransfer.getData("text/plain")
-      false
 
   # PlanOverlay.prototype = new google.maps.OverlayView()
   google.maps.event.addDomListener(window, 'load', initializeMap)
