@@ -9,6 +9,10 @@ ul.nav.navbar-nav.navbar-right {
   }
 }
 
+#newPlan .map-canvas {
+  width: 50%;
+}
+
 li.plan_id {
   display: none;
 }
@@ -57,8 +61,10 @@ li.plan_id {
 
 }
 
-.planform .row {
+.planform, .newuserform {
+  .row {
   margin-bottom: 10px;
+  }
 }
 
 #like_div form {

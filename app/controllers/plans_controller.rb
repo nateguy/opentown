@@ -53,7 +53,7 @@ class PlansController < ApplicationController
   def destroy
     @plan.destroy
     respond_to do |format|
-      format.html { redirect_to plans_url, notice: 'Plan removed.' }
+      format.html { redirect_to plans_all_path, notice: 'Plan removed.' }
       format.json { head :no_content }
     end
   end
@@ -73,7 +73,7 @@ class PlansController < ApplicationController
 
     respond_to do |format|
       if @plan.save
-        format.html { redirect_to plans_url, notice: 'Plan was successfully created.' }
+        format.html { redirect_to plans_all_path, notice: 'Plan was successfully created.' }
         format.json { render :show, status: :created, location: @plan }
       else
         format.html { render :new }
@@ -86,6 +86,12 @@ class PlansController < ApplicationController
     @plan_id = params[:plan_id]
     # @comments = Plan.find(plan_id).comments
     # @users = User.all
+  end
+
+  def deletepolygon
+    id = params[:id]
+    Polygon.find(id).destroy
+    redirect_to :back
   end
 
   def modifypolygon
@@ -106,6 +112,7 @@ class PlansController < ApplicationController
       polygon.description = params[:description]
       polygon.save
 
+
     end
 
     paths = params[:paths]
@@ -117,8 +124,12 @@ class PlansController < ApplicationController
     @paths.each do |cord|
       cord = cord.split(", ")
 
-      Vertex.create(polygon_id: id, lat: cord[0], lng: cord[1], todelete: false)
-
+      i = Vertex.new(polygon_id: id, lat: cord[0], lng: cord[1], todelete: false)
+      i.save
+    end
+    oldpolygons = Vertex.where(todelete: true)
+    oldpolygons.each do |oldpolygon|
+      oldpolygon.destroy
     end
     redirect_to :back
 

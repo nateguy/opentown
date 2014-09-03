@@ -17,20 +17,3 @@ $ ->
       e.dataTransfer.setData("text", zoneid)
       false
     )
-  # dropbox = document.querySelector("#infoBoxDrop")
-  # dropbox.addEventListener('dragenter', (e) ->
-  #   )
-  # dropbox.addEventListener('dragover' , (e) ->
-  #   e.preventDefault()
-  #   false
-  #   )
-  # dropbox.addEventListener('dragleave', (e) ->
-  #   )
-  # dropbox.addEventListener('drop', (e) ->
-  #   console.log "dropped"
-  #   e.preventDefault()
-  #   false
-  #   )
-  console.log zones
-  #zones = $(".class")
-

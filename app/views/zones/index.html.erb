@@ -1,4 +1,4 @@
-
+<h1>Zone Edit Panel</h1>
 
 <table class="table table-stripped">
   <thead>
@@ -8,6 +8,7 @@
       <th>Classification</th>
       <th>Color Code</th>
       <th>Texture</th>
+      <th>Controls</th>
     </tr>
   </thead>
 
@@ -20,8 +21,8 @@
       <td bgcolor=<%= zone.color_code %>></td>
       <td><%= image_tag zone.texture.url(:thumb) %></td>
 
-      <td><%= link_to 'Edit', edit_zone_path(zone), :class => 'btn btn-primary' %></td>
-      <td><%= link_to 'Delete', zone, method: :delete, data: { confirm: 'Are you sure?' }, :class => 'btn btn-primary' %></td>
+      <td><%= link_to 'Edit', edit_zone_path(zone), :class => 'btn btn-primary' %>
+      <%= link_to 'Delete', zone, method: :delete, data: { confirm: 'Are you sure?' }, :class => 'btn btn-primary' %></td>
     </tr>
     <% end %>
   </tbody>

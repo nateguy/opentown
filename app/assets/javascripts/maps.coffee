@@ -37,7 +37,6 @@ $ ->
       loadAllZones(planid)
 
     if $("body.plans.userplan").length
-      console.log "user plan"
       planid = $(".plan_id").data('planid')
       customPolygons = loadCustomPolygons(planid)
       loadAllZones(planid, customPolygons)
@@ -96,7 +95,7 @@ $ ->
       latlng = new google.maps.LatLng(22.297256, 113.948430)
       mapOptions =
         center: latlng,
-        zoom: 15
+        zoom: 10
       map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions)
 
       for i of data
@@ -109,7 +108,9 @@ $ ->
 
           if polygon.polygontype == "planmap"
             polygon = drawPolygon(polygon, false, planid)
-
+            polygon.strokeWeight = 2
+            polygon.strokeColor = '#ffffff'
+            polygon.fillOpacity = 0.8
             marker = new google.maps.Marker
               position: new google.maps.LatLng(center[0], center[1])
               map: map
@@ -124,7 +125,7 @@ $ ->
 
 
   showInfo = (event) ->
-    console.log "shoew"
+
     id = this.id
     planid = this.planid
     name = this.name
@@ -136,7 +137,6 @@ $ ->
     infoWindow.open(map)
 
   setEditable = (polygon) ->
-    console.log "editing"
     polygon.editable = true
     addDeleteButton(polygon, 'http://i.imgur.com/RUrKV.png')
     google.maps.event.addListener(polygon, 'click', showZoneEdit)
@@ -157,13 +157,15 @@ $ ->
 
     zoneid = polygon.zone_id
     description = polygon.description
+    polygontype = polygon.polygontype
     if customPolygons? and customPolygons[polygon.id]?
-      console.log "there is a custompolygon"
+
       zoneid = customPolygons[polygon.id].zoneid
       description = customPolygons[polygon.id].description
 
     for vertex in polygon.vertices
       vertices.push new google.maps.LatLng(vertex.lat, vertex.lng)
+
 
     polygon = new google.maps.Polygon
       editable: true
@@ -176,9 +178,15 @@ $ ->
       description: polygon.description
       planid: planid
       name: polygon.name
+    console.log polygontype
+    if polygontype == "planmap"
+      polygon.zIndex = -100
+
+    else
+      polygon.zIndex = 2
+    console.log polygon
     polygon.setMap(map)
     infoWindow = new google.maps.InfoWindow()
-    console.log "editable"
     if editable is true
       setEditable(polygon)
     else
@@ -196,14 +204,13 @@ $ ->
       )
 
     response.done (data) ->
-      console.log "showing data"
-      console.log data
+
 
       imageBounds = new google.maps.LatLngBounds(
         new google.maps.LatLng(data.sw_lat,data.sw_lng)
         new google.maps.LatLng(data.ne_lat,data.ne_lng))
       if data.polygons.length > 0
-        console.log "in polygons"
+
         center = centerMap(data.polygons)
         center_lng = center[1]
         center_lat = center[0]
@@ -226,14 +233,11 @@ $ ->
         drawingControlOptions:
           position: google.maps.ControlPosition.TOP_CENTER
           drawingModes: [
-            google.maps.drawing.OverlayType.MARKER,
-            google.maps.drawing.OverlayType.CIRCLE,
+
             google.maps.drawing.OverlayType.POLYGON,
-            google.maps.drawing.OverlayType.POLYLINE
+
           ]
 
-        markerOptions:
-          icon: 'images/beachflag.png'
 
         polygonOptions:
           fillColor: '#ffff00'
@@ -245,25 +249,22 @@ $ ->
           zIndex: 1
       )
       drawingManager.setMap map
-      console.log imageBounds
 
       control = drawControl(map, imageBounds)
       window.img = data.overlay
       overlayImage = new Image()
       overlayImage.src = data.overlay
-      overlayImage.width
-      overlayImage.height
+
       window.overlay = drawGroundOverlay(map, window.img, imageBounds)
-      console.log window.overlay
+
       google.maps.event.addListener(control, 'bounds_changed', boundsChangedHandler)
       google.maps.event.addListener(control, 'rightclick', (e) ->
-
-        width = (data.ne_lat - data.sw_lat)
-        height = width * (overlayImage.height / overlayImage.width)
+        height = (data.ne_lat - data.sw_lat)
+        width = height * (overlayImage.width / overlayImage.height)
 
         center_lng = (data.sw_lng + data.ne_lng) / 2
-        new_sw_lng = center_lng - (height / 2)
-        new_ne_lng = center_lng + (height / 2)
+        new_sw_lng = center_lng - (width / 2)
+        new_ne_lng = center_lng + (width / 2)
 
         imageBounds = new google.maps.LatLngBounds(
           new google.maps.LatLng(data.sw_lat,new_sw_lng)
@@ -275,22 +276,20 @@ $ ->
         infoWindow.close()
         infoWindow = new google.maps.InfoWindow()
 
-        resize = "<a id='setProportion'>Hey</a>"
-        content = "Save new bounds: <form action='/plans/update_bounds' method='post'><input name='sw_lat' type='text' value='#{this.getBounds().getSouthWest().lat()}'>
-                  <input name='id' value='#{planid}' type='text'>
-                  <input name='sw_lng' type='text' value='#{this.getBounds().getSouthWest().lng()}'>
-                  <input name='ne_lat' type='text' value='#{this.getBounds().getNorthEast().lat()}'>
-                  <input name='ne_lng' type='text' value='#{this.getBounds().getNorthEast().lng()}'>
-                  <input type='submit'></form>"
+        resize = "<h5>Set New Image Bounds</h5>"
+        content = "<form action='/plans/update_bounds' method='post'>
+                  <input name='id' value='#{planid}' type='hidden'>
+                  <input name='sw_lat' type='hidden' value='#{this.getBounds().getSouthWest().lat()}'>
+                  <input name='sw_lng' type='hidden' value='#{this.getBounds().getSouthWest().lng()}'>
+                  <input name='ne_lat' type='hidden' value='#{this.getBounds().getNorthEast().lat()}'>
+                  <input name='ne_lng' type='hidden' value='#{this.getBounds().getNorthEast().lng()}'>
+                  <input type='submit' value='Save' class='btn btn-default btn-primary'>
+                  </form>"
         infoWindow.setContent(resize + content)
         infoWindow.setPosition(e.latLng)
         infoWindow.open(map)
         )
-      # newOverlay = new google.maps.GroundOverlay(
-      #   '/plan/tungchung_cropped.jpg',
-      #   imageBounds)
-      addOverlay()
-      #newOverlay.setMap(map)
+
 
 
       if data.polygons.length > 0
@@ -302,20 +301,14 @@ $ ->
       google.maps.event.addListener drawingManager, "overlaycomplete", (event) ->
 
         overlayClickListener(event.overlay, planid)
-        #$('#vertices').val(event.overlay.getPath().getArray())
-        console.log event.overlay.getPath().getArray()
+
 
   overlayClickListener = (overlay, planid) ->
     google.maps.event.addListener overlay, "mouseup", (event) ->
-        #$('#vertices').val(overlay.getPath().getArray())
+
 
         addDeleteButton(overlay, 'http://i.imgur.com/RUrKV.png')
         google.maps.event.addListener(overlay, 'click', showZoneEdit)
-        #for polygon in polygons
-        #  console.log polygon
-        #  if google.maps.geometry.poly.isLocationOnEdge(event.latLng, polygon)
-        #    console.log "touching another polygon: " + true
-        #console.log event.vertex.lng
 
 
 
@@ -360,7 +353,6 @@ $ ->
     btnDelete.click(path.btnDeleteClickHandler)
 
   getDeleteButton = (imageUrl) ->
-    console.log "deletebtn" + imageUrl
     $("img[src$='" + imageUrl + "']")
 
   showZoneEdit = (event) ->
@@ -374,7 +366,7 @@ $ ->
     id = this.id
     description = this.description
     #polygon id
-    console.log "polygon id " + id
+
     planid = this.planid
     name = this.name
 
@@ -385,25 +377,51 @@ $ ->
       id = ""
 
     paths = this.getPath().getArray()
-    #console.log id
+    console.log paths
+    console.log id
+    content = "<div class='row'>Zone Type:</div>
+              <div class='row'><div id='infoBoxDrop'><h4>Drop Custom Zone here</h4></div></div>
 
-    content = "<form action='/plans/modifypolygon' method='post'>
-                <div class='row'>Polygon Type:</div>
-                <div class='row'><select name='polygontype'>
-                <option value='planmap'>Plan</option>
-                <option value='zone'>Zone</option></select></div>
-                <input name='paths' type='hidden' value='#{paths}'>
-                <input name='planid' type='hidden' value='#{planid}'>
-                <input name='id' type='hidden' value='#{id}'>
-                <div class='row'>Zone Type:</div>
-                <div class='row'><select name='zoneid'>" + getZonesSelectBox() + "</select></div>
-                <div class='row'>Description:</div>
-                <div class='row'><input name='description' type='text' value='#{description}'></div>
-                <div class='row'><input type='submit' value='submit' class='btn btn-primary btn-sm'></div></form>"
-    #console.log event.latLng.lat() + " " + event.latLng.lng()
+              <form action='/plans/modifypolygon' method='post'>
+              <div class='row'>Polygon Type:</div>
+              <div class='row'><div class='radio'>
+                <label><input type='radio' name='polygontype' id='radio_planmap' value='planmap'>Plan Layout</label>
+              </div>
+              <div class='radio'>
+                <label><input type='radio' name='polygontype' id='radio_zone' value='zone' checked>Zone</label>
+              </div></div>
+              <input name='paths' type='hidden' value='#{paths}'>
+              <input name='planid' type='hidden' value='#{planid}'>
+              <input name='id' type='hidden' value='#{id}'>
+              <input type='hidden' name='zoneid'>
+              <div class='row'>Description:</div>
+              <div class='row'><div class='form-group'>
+              <textarea value='#{description}' placeholder='Describe what should go here instead' name='description' rows='2' class='form-control'>
+              </textarea></div></div>
+              <div class='row'><input type='submit' value='submit' class='btn btn-primary btn-sm'></div></form>
+              <div class='row'><form action='/plans/deletepolygon/' method='post'><input name='id' type='hidden' value='#{id}'>
+              <input type='submit' value='Delete' class='btn btn-primary btn-sm'>
+              </div></form>"
     infoWindow.setContent(content)
     infoWindow.setPosition(event.latLng)
     infoWindow.open(map)
+
+    infoBoxDrop = document.getElementById("infoBoxDrop")
+    infoBoxDrop.addEventListener('dragover' , (e) ->
+      e.preventDefault()
+      false
+    )
+    infoBoxDrop.addEventListener('drop', (e) ->
+      console.log "dropped "
+      newzone = e.dataTransfer.getData("text/plain")
+      $("input[name='zoneid']").val(newzone)
+      $("#infoBoxDrop").html("<div class='legendbox' style='background-color:" + zones[newzone].color_code + "'></div>
+        <h5>" + zones[newzone].classification + "</h5>")
+      e.preventDefault()
+      false
+    )
+
+
 
 
   loadAllZones = (planid, customPolygons) ->
@@ -438,18 +456,6 @@ $ ->
       selectbox += "<option value=#{id}>#{zones[id].description}</option>"
     selectbox
 
-  filterArray = (data, type, id) ->
-    if type == "polygon"
-      data = data.filter((polygon) ->
-          polygon.polygon_id == id
-          )
-    if type == "zone"
-      data = data.filter((polygon) ->
-          console.log "this: " + polygon.custom_zone + " " + id
-          console.log "this: " + (polygon.custom_zone == id)
-          polygon.custom_zone == id
-          )
-    return data
 
   showZoneStats = (event) ->
     zones
@@ -482,7 +488,7 @@ $ ->
         obj2.size - obj1.size
         )
 
-      console.log zone_users
+
       content = "<table class='table table-striped'><tr><th>Zone Code</th><th>Users</th></tr>"
 
       heading = "<h5>Proposed Alternatives</h5>"
@@ -500,7 +506,6 @@ $ ->
 
   showZoneInfo = (event) ->
 
-    console.log "show zone info"
     id = this.id
     zoneid = this.zoneid
     planid = this.planid
@@ -598,26 +603,23 @@ drawControl = (map, bounds) ->
     draggable: true,
     editable: true
     clickable: true
+    zIndex: 0
 
 drawGroundOverlay = (map, url, bounds) ->
   options =
     opacity: 0.7
+    zIndex: 0
   overlay = new google.maps.GroundOverlay(url, bounds, options)
   overlay.setMap(map)
   overlay
 
-lockOverlay = ->
-  console.log window
-  window.overlay.editable = false
-
-unlockOverlay = ->
-  window.overlay.editable = true
-  console.log window
 
 addOverlay = ->
+
   window.overlay.setMap(map)
 
 removeOverlay = ->
+
   window.overlay.setMap(null)
 
 
@@ -645,11 +647,9 @@ zoneTypes = ->
   )
 
   response.done (data) ->
-    console.log data
 
     for i of data
 
-      console.log data[i].id
       id = data[i].id
       code = data[i].code
       description = data[i].description

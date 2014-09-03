@@ -8,7 +8,21 @@
 }
 
 .plans #map-canvas {
+  height: 500px;
+  position: relative;
+}
+
+.plans.new #map-canvas {
   height: 300px;
+  max-width: 600px;
+  width: 100%;
+
+  position: relative;
+}
+
+.plans.new #map-container {
+  margin: 0 auto;
+  width: 600px;
 }
 
 .map_addess {

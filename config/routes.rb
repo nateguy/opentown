@@ -19,7 +19,7 @@ Rails.application.routes.draw do
   get 'plans/all' => 'plans#showall'
   get 'plans/stats/' => 'plans#stats'
   post 'plans/update_bounds' => 'plans#update_bounds'
-
+  post 'plans/deletepolygon' => 'plans#deletepolygon'
   resources :zones
   resources :plans
   resources :comments
