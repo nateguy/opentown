@@ -2,6 +2,7 @@ class ZonesController < ApplicationController
   before_action :set_zone, only: [:show, :edit, :update, :destroy]
 
   def index
+    response.headers["Vary"]= "Accept"
     @zones = Zone.all
   end
 

@@ -404,7 +404,6 @@ $ ->
       )
 
     response.done (data) ->
-
       center = centerMap(data.polygons)
       latlng = new google.maps.LatLng(center[0], center[1])
       mapOptions =

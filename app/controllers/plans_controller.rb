@@ -12,6 +12,7 @@ class PlansController < ApplicationController
   end
 
   def show
+    response.headers["Vary"]= "Accept"
     @users = User.all
 
   end
