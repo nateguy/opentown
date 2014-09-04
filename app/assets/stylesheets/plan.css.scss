@@ -9,8 +9,44 @@ ul.nav.navbar-nav.navbar-right {
   }
 }
 
-#newPlan .map-canvas {
+
+.plans #map-canvas {
+  height: 500px;
+  position: relative;
+}
+
+.plans.new #map-canvas {
+  height: 300px;
+  width: 100%;
+  position: relative;
+}
+
+
+.plans.new #map-container {
+  margin: 0 auto;
+  width: 100%;
+  padding-left: 15px;
+  padding-right: 15px;
+  position: relative;
+  margin-bottom: 10px;
+}
+
+#newPlan {
+  margin: 0 auto;
+  padding: 10px 10px 10px 10px;
+  width: 80%;
+  border: 1px;
+  border-radius: 10px;
+  background-color: #cccccc;
+  h1 {
+    text-align: center;
+    color: #880000;
+  }
+
+  .map-canvas {
   width: 50%;
+  position: relative;
+}
 }
 
 li.plan_id {

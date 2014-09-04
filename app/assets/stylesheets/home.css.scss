@@ -14,16 +14,13 @@
 
 .plans.new #map-canvas {
   height: 300px;
-  max-width: 600px;
   width: 100%;
-
+  padding-left: 15px;
+  padding-right: 15px;
   position: relative;
 }
 
-.plans.new #map-container {
-  margin: 0 auto;
-  width: 600px;
-}
+
 
 .map_addess {
   input {
