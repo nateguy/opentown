@@ -29,7 +29,36 @@ body {
 
 }
 
+.btn-primary {
+  background-color: #880000;
+  border-color: #440000;
+}
 
+.btn-primary:hover {
+  background-color: #440000;
+  border-color: #440000;
+}
+
+
+#form_modify_polygon .btn-primary {
+  float: left;
+  margin-right: 2px;
+}
+
+#panel {
+  h1 {
+  float: left;
+  color: #880000;
+  margin-top: 0;
+  margin-right: 10px;
+}
+
+.form-control {
+  display: inline;
+  width: 40%;
+  min-width: 160px;
+}
+}
 
 .navbar-inverse .navbar-brand {
   background-color: #ffffff;

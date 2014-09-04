@@ -1,33 +1,34 @@
+<div id="table-page">
 <h1>Zone Edit Panel</h1>
 
 <table class="table table-stripped">
   <thead>
     <tr>
-      <th>Code</th>
-      <th>Description</th>
-      <th>Classification</th>
-      <th>Color Code</th>
-      <th>Texture</th>
-      <th>Controls</th>
+      <th class="col-md-1">Code</th>
+      <th class="col-md-3">Description</th>
+      <th class="col-md-3">Classification</th>
+      <th class="col-md-2">Color</th>
+      <th class="col-md-1">Texture</th>
+
     </tr>
   </thead>
 
   <tbody>
     <% @zones.each do |zone| %>
     <tr>
-      <td><%= zone.code %></td>
-      <td><%= zone.description %></td>
-      <td><%= zone.classification %></td>
-      <td bgcolor=<%= zone.color_code %>></td>
-      <td><%= image_tag zone.texture.url(:thumb) %></td>
+      <td class="col-md-1"><%= zone.code %></td>
+      <td class="col-md-3"><%= zone.description %></td>
+      <td class="col-md-3"><%= zone.classification %></td>
+      <td class="col-md-2" bgcolor=<%= zone.color_code %>></td>
+      <td class="col-md-1"><%= image_tag zone.texture.url(:thumb) %></td>
 
-      <td><%= link_to 'Edit', edit_zone_path(zone), :class => 'btn btn-primary' %>
-      <%= link_to 'Delete', zone, method: :delete, data: { confirm: 'Are you sure?' }, :class => 'btn btn-primary' %></td>
+      <td class="col-md-1"><%= link_to 'Edit', edit_zone_path(zone), :class => 'btn btn-primary' %></td>
+      <td class="col-md-1"><%= link_to 'Delete', zone, method: :delete, data: { confirm: 'Are you sure?' }, :class => 'btn btn-primary' %></td>
     </tr>
     <% end %>
   </tbody>
 </table>
-
+</div>
 
 
 <%= link_to 'Add New Zone', new_zone_path %>

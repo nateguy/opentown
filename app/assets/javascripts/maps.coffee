@@ -180,10 +180,12 @@ $ ->
       name: polygon.name
     console.log polygontype
     if polygontype == "planmap"
-      polygon.zIndex = -100
+      polygon.zIndex = 1
+      console.log "planmap 1"
 
     else
       polygon.zIndex = 2
+      console.log "zone 2"
     console.log polygon
     polygon.setMap(map)
     infoWindow = new google.maps.InfoWindow()
@@ -291,10 +293,16 @@ $ ->
         )
 
 
-
       if data.polygons.length > 0
         for polygon in data.polygons
-          drawPolygon(polygon, true, planid)
+          if polygon.polygontype == "planmap"
+            drawPolygon(polygon, true, planid)
+        for polygon in data.polygons
+          if polygon.polygontype == "zone"
+            drawPolygon(polygon, true, planid)
+
+
+
       else
         infoWindow = new google.maps.InfoWindow()
 
@@ -398,8 +406,8 @@ $ ->
               <div class='row'><div class='form-group'>
               <textarea value='#{description}' placeholder='Describe what should go here instead' name='description' rows='2' class='form-control'>
               </textarea></div></div>
-              <div class='row'><input type='submit' value='submit' class='btn btn-primary btn-sm'></div></form>
-              <div class='row'><form action='/plans/deletepolygon/' method='post'><input name='id' type='hidden' value='#{id}'>
+              <div class='row' id='form_modify_polygon'><input type='submit' value='submit' class='btn btn-primary btn-sm'></form>
+              <form action='/plans/deletepolygon/' method='post'><input name='id' type='hidden' value='#{id}'>
               <input type='submit' value='Delete' class='btn btn-primary btn-sm'>
               </div></form>"
     infoWindow.setContent(content)
@@ -444,10 +452,18 @@ $ ->
 
 
       for polygon in data.polygons
-        if customPolygons? and customPolygons[polygon.id]?
-          drawPolygon(polygon, false, planid, customPolygons)
-        else
-          drawPolygon(polygon, false, planid)
+        if polygon.polygontype == "planmap"
+          if customPolygons? and customPolygons[polygon.id]?
+            drawPolygon(polygon, false, planid, customPolygons)
+          else
+            drawPolygon(polygon, false, planid)
+
+      for polygon in data.polygons
+        if polygon.polygontype == "zone"
+          if customPolygons? and customPolygons[polygon.id]?
+            drawPolygon(polygon, false, planid, customPolygons)
+          else
+            drawPolygon(polygon, false, planid)
 
 
   getZonesSelectBox = ->
@@ -582,9 +598,7 @@ $ ->
         if status == google.maps.GeocoderStatus.OK
 
             map.setCenter results[0].geometry.location
-            marker = new google.maps.Marker
-                map: map,
-                position: results[0].geometry.location
+
         else
             alert "geocode not successful"
 

@@ -1,12 +1,12 @@
-<h1>Plan Edit Panel</h1>
+<div id="table-page">
+<h1>Edit Plans</h1>
 
 <table class="table table-stripped">
   <thead>
     <tr>
-      <th>ID</th>
-      <th>Name</th>
-      <th>District</th>
-      <th>Controls</th>
+      <th class="col-md-1">ID</th>
+      <th class="col-md-4">Name</th>
+      <th class="col-md-4">District</th>
     </tr>
   </thead>
 
@@ -14,14 +14,15 @@
     <% @plans.each do |plan| %>
       <% @plan = plan %>
     <tr>
-      <td><%= plan.id %></td>
-      <td><%= plan.name %></td>
-      <td><%= plan.district %></td>
+      <td class="col-md-1"><%= plan.id %></td>
+      <td class="col-md-4"><%= plan.name %></td>
+      <td class="col-md-4"><%= plan.district %></td>
 
-      <td><%= link_to 'Edit', edit_plan_path(plan), :class => 'btn btn-primary' %>
-      <%= link_to 'Stats', plans_stats_path(id: @plan.id), :class => 'btn btn-primary' %>
-      <%= link_to 'Delete', plan, method: :delete, data: { confirm: 'Are you sure?' }, :class => 'btn btn-primary' %></td>
+      <td class="col-md-1"><%= link_to 'Edit', edit_plan_path(plan), :class => 'btn btn-primary' %></td>
+      <td class="col-md-1"><%= link_to 'Stats', plans_stats_path(id: @plan.id), :class => 'btn btn-primary' %></td>
+      <td class="col-md-1"><%= link_to 'Delete', plan, method: :delete, data: { confirm: 'Are you sure?' }, :class => 'btn btn-primary' %></td>
     </tr>
     <% end %>
   </tbody>
 </table>
+</div>
