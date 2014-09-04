@@ -136,10 +136,21 @@ $ ->
     infoWindow.setPosition(event.latLng)
     infoWindow.open(map)
 
+
   setEditable = (polygon) ->
-    polygon.editable = true
-    addDeleteButton(polygon, 'http://i.imgur.com/RUrKV.png')
+    console.log polygon
+    polygon.fillOpacity = 0.7
+    polygon.editable = false
     google.maps.event.addListener(polygon, 'click', showZoneEdit)
+    google.maps.event.addListener(polygon, 'mouseover', ->
+      this.setEditable(true)
+      )
+    google.maps.event.addListener(polygon, 'mouseout', ->
+      this.setEditable(false)
+      )
+    addDeleteButton(polygon, 'http://i.imgur.com/RUrKV.png')
+
+
 
   setNotEditable = (polygon) ->
     polygon.fillOpacity = 1
@@ -307,7 +318,6 @@ $ ->
         infoWindow = new google.maps.InfoWindow()
 
       google.maps.event.addListener drawingManager, "overlaycomplete", (event) ->
-
         overlayClickListener(event.overlay, planid)
 
 
@@ -364,12 +374,10 @@ $ ->
     $("img[src$='" + imageUrl + "']")
 
   showZoneEdit = (event) ->
+    console.log "hey"
+    console.log event
 
-    if event.vertex == undefined
-      content = ""
-    else
-      content = "This is a vertex"
-
+    console.log this.editable = true
 
     id = this.id
     description = this.description
@@ -385,9 +393,10 @@ $ ->
       id = ""
 
     paths = this.getPath().getArray()
-    console.log paths
-    console.log id
-    content = "<div class='row'>Zone Type:</div>
+
+    content = "<div class='row'>Current Zone:</div><div class='row'>
+    <div class='legendbox' style='background-color:" + zones[this.zoneid].color_code + "'></div><h5>" + zones[this.zoneid].classification + "</h5></div>
+              <div class='row'>New Zone:</div>
               <div class='row'><div id='infoBoxDrop'><h4>Drop Custom Zone here</h4></div></div>
 
               <form action='/plans/modifypolygon' method='post'>
@@ -528,16 +537,21 @@ $ ->
     name = this.name
     description = this.description
     paths = this.getPath().getArray()
+    console.log paths
+    console.log id
     $(".zone.#{lastZone}").css('background-color','')
     $(".zone.#{lastZone} a").css('color','')
     $(".zone.#{zoneid}").css('background-color','#880000')
     $(".zone.#{zoneid} a").css('color','#ffffff')
     lastZone = zoneid
 
-    heading = "Information:"
-    content = "<h5>" + description + "</h5>"
+    heading = "<h5>Zone:</h5>"
+    content = "<div class='legendbox' style='background-color:" + zones[this.zoneid].color_code + "'></div><div class='row'>" + zones[this.zoneid].classification + "</div></div>
+    <h5>Description:</h5><div class='row'>" + description + "</div>"
+
     if $("body.plans.userplan").length
-      content = content + "<div class='row'><div id='infoBoxDrop'><h4>Drop Custom Zone here</h4></div></div>
+      content = content + "<h5>New Zone:</h5><div class='row'><div id='infoBoxDrop'><h4>Drop Custom Zone here</h4></div></div>
+      <h5>New Description:</h5>
       <form action='/plans/userplan/newzone/' method='post'>
       <div class='row'>
         <div class='form-group'><textarea placeholder='Describe what should go here instead' name='description' rows='2' class='form-control'></textarea>
