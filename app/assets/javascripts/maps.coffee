@@ -138,7 +138,6 @@ $ ->
 
 
   setEditable = (polygon) ->
-    console.log polygon
     polygon.fillOpacity = 0.7
     polygon.editable = false
     google.maps.event.addListener(polygon, 'click', showZoneEdit)
@@ -189,15 +188,14 @@ $ ->
       description: polygon.description
       planid: planid
       name: polygon.name
-    console.log polygontype
+
     if polygontype == "planmap"
       polygon.zIndex = 1
-      console.log "planmap 1"
+
 
     else
       polygon.zIndex = 2
-      console.log "zone 2"
-    console.log polygon
+
     polygon.setMap(map)
     infoWindow = new google.maps.InfoWindow()
     if editable is true
@@ -231,8 +229,6 @@ $ ->
       else
         center_lng = (data.ne_lng + data.sw_lng) / 2
         center_lat = (data.ne_lat + data.sw_lat) / 2
-        console.log "center_lng" + center_lng
-        console.log "center_lat" + center_lat
 
       latlng = new google.maps.LatLng(center_lat,center_lng)
       mapOptions =
@@ -374,18 +370,11 @@ $ ->
     $("img[src$='" + imageUrl + "']")
 
   showZoneEdit = (event) ->
-    console.log "hey"
-    console.log event
-
-    console.log this.editable = true
 
     id = this.id
     description = this.description
-    #polygon id
-
     planid = this.planid
     name = this.name
-
 
     if this.description is undefined
       description = ""
@@ -429,7 +418,6 @@ $ ->
       false
     )
     infoBoxDrop.addEventListener('drop', (e) ->
-      console.log "dropped "
       newzone = e.dataTransfer.getData("text/plain")
       $("input[name='zoneid']").val(newzone)
       $("#infoBoxDrop").html("<div class='legendbox' style='background-color:" + zones[newzone].color_code + "'></div>
@@ -537,8 +525,7 @@ $ ->
     name = this.name
     description = this.description
     paths = this.getPath().getArray()
-    console.log paths
-    console.log id
+
     $(".zone.#{lastZone}").css('background-color','')
     $(".zone.#{lastZone} a").css('color','')
     $(".zone.#{zoneid}").css('background-color','#880000')
@@ -574,7 +561,7 @@ $ ->
         false
       )
       infoBoxDrop.addEventListener('drop', (e) ->
-        console.log "dropped "
+
         newzone = e.dataTransfer.getData("text/plain")
         $("input[name='zoneid']").val(newzone)
         $("#infoBoxDrop").html("<div class='legendbox' style='background-color:" + zones[newzone].color_code + "'></div>
