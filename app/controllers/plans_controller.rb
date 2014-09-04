@@ -107,7 +107,15 @@ class PlansController < ApplicationController
         oldpolygon.save
       end
       polygon = Polygon.find(id)
-      polygon.polygontype = params[:polygontype]
+
+      i = Polygon.where(polygontype: "planmap", plan_id: params[:planid]).count
+      if (i <= 1)
+        polygon.polygontype = "planmap"
+      else
+        polygon.polygontype = params[:polygontype]
+      end
+
+
       polygon.zone_id = params[:zoneid]
       polygon.description = params[:description]
       polygon.save

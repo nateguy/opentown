@@ -380,12 +380,15 @@ $ ->
       description = ""
     if id is undefined
       id = ""
+      content = ""
+    else
+      content = "<div class='row'>Current Zone:</div><div class='row'>
+      <div class='legendbox' style='background-color:" + zones[this.zoneid].color_code + "'></div><h5>" + zones[this.zoneid].classification + "</h5></div>"
+
 
     paths = this.getPath().getArray()
-
-    content = "<div class='row'>Current Zone:</div><div class='row'>
-    <div class='legendbox' style='background-color:" + zones[this.zoneid].color_code + "'></div><h5>" + zones[this.zoneid].classification + "</h5></div>
-              <div class='row'>New Zone:</div>
+    console.log paths
+    content = content + "<div class='row'>New Zone:</div>
               <div class='row'><div id='infoBoxDrop'><h4>Drop Custom Zone here</h4></div></div>
 
               <form action='/plans/modifypolygon' method='post'>
@@ -399,7 +402,7 @@ $ ->
               <input name='paths' type='hidden' value='#{paths}'>
               <input name='planid' type='hidden' value='#{planid}'>
               <input name='id' type='hidden' value='#{id}'>
-              <input type='hidden' name='zoneid'>
+              <input type='hidden' name='zoneid' value=0>
               <div class='row'>Description:</div>
               <div class='row'><div class='form-group'>
               <textarea value='#{description}' placeholder='Describe what should go here instead' name='description' rows='2' class='form-control'>
