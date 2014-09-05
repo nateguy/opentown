@@ -98,50 +98,37 @@ class PlansController < ApplicationController
     if params[:id].blank?
       polygon = Polygon.new(plan_id: params[:planid], polygontype: params[:polygontype], zone_id: params[:zoneid], description: params[:description])
       polygon.save
-      id = polygon.id
     else
-      id = params[:id]
-      oldpolygons = Vertex.where(polygon_id: id)
-      oldpolygons.each do |oldpolygon|
-        oldpolygon.todelete = true
-        oldpolygon.save
-      end
-      polygon = Polygon.find(id)
+      polygon = Polygon.find(params[:id])
+      oldpolygons = Array.new(polygon.vertices)
 
-      i = Polygon.where(polygontype: "planmap", plan_id: params[:planid]).count
-      if (i <= 1)
+      planmap_count = Polygon.where(polygontype: "planmap", plan_id: params[:planid]).count
+      if (planmap_count <= 1)
         polygon.polygontype = "planmap"
       else
         polygon.polygontype = params[:polygontype]
       end
 
-
       polygon.zone_id = params[:zoneid]
       polygon.description = params[:description]
       polygon.save
 
-
     end
 
-    paths = params[:paths]
+    @paths = JSON(params[:paths])
+    @paths.each do |vertex|
 
-    paths = paths.strip
-    paths = paths[1..paths.length - 2]
-    @paths = paths.split("),(")
-
-    @paths.each do |cord|
-      cord = cord.split(", ")
-
-      i = Vertex.new(polygon_id: id, lat: cord[0], lng: cord[1], todelete: false)
-      i.save
+      new_vertex = polygon.vertices.new(lat: vertex["lat"], lng: vertex["lng"], todelete: false)
+      new_vertex.save
     end
-    oldpolygons = Vertex.where(todelete: true)
-    oldpolygons.each do |oldpolygon|
-      oldpolygon.destroy
+
+    unless oldpolygons.blank?
+      oldpolygons.each do |old_vertex|
+        polygon.vertices.find(old_vertex.id).destroy
+      end
     end
+
     redirect_to :back
-
-
   end
 
 

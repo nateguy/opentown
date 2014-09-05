@@ -377,7 +377,7 @@ $ ->
     name = this.name
 
     if this.description is undefined
-      description = ""
+          description = ""
     if id is undefined
       id = ""
       content = ""
@@ -385,8 +385,10 @@ $ ->
       content = "<div class='row'>Current Zone:</div><div class='row'>
       <div class='legendbox' style='background-color:" + zones[this.zoneid].color_code + "'></div><h5>" + zones[this.zoneid].classification + "</h5></div>"
 
-
-    paths = this.getPath().getArray()
+    paths_object = new Array()
+    for path in this.getPath().getArray()
+      paths_object.push { 'lat': path.lat(), 'lng': path.lng()}
+    paths = JSON.stringify(paths_object)
     console.log paths
     content = content + "<div class='row'>New Zone:</div>
               <div class='row'><div id='infoBoxDrop'><h4>Drop Custom Zone here</h4></div></div>
