@@ -5,21 +5,20 @@ myDrawingManager = null      # holds drawing tools
 myField = null               # holds the polygon we draw using drawing tools
 myInfoWindow = null          #when our polygon is clicked, a dialog box
 centerpoint = null
-# overlay = null
 polygon = []
 polygonVertices = {}
 zones = {}
-lastZone = null
 newOverlay = null
 window.overlay = undefined
 window.img = ''
 rectangle = null
-#default_latlng = new google.maps.LatLng(22.294193,113.946973)
+control = null
 
 $ ->
 
   newOverlay = null
   zones = zoneTypes()
+  console.log zones
 
   initializeMap = ->
 
@@ -27,24 +26,24 @@ $ ->
 
     if $("body.plans.edit").length
 
-      planid = $(".plan_id").data('planid')
-      DrawZonesTest(planid)
+      planId = $(".plan_id").data('planid')
+      DrawZonesTest(planId)
 
 
     if $("body.plans.show").length
 
-      planid = $(".plan_id").data('planid')
-      loadAllZones(planid)
+      planId = $(".plan_id").data('planid')
+      loadAllZones(planId)
 
     if $("body.plans.userplan").length
-      planid = $(".plan_id").data('planid')
-      customPolygons = loadCustomPolygons(planid)
-      loadAllZones(planid, customPolygons)
+      planId = $(".plan_id").data('planid')
+      customPolygons = loadCustomPolygons(planId)
+      loadAllZones(planId, customPolygons)
 
     if $("body.plans.stats").length
 
-      planid = $(".plan_id").data('planid')
-      loadAllZones(planid)
+      planId = $(".plan_id").data('planid')
+      loadAllZones(planId)
 
     if $("body.home").length
       loadPlansOnly()
@@ -62,19 +61,15 @@ $ ->
       zoom: 15
     map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions)
     marker = new google.maps.Marker
-    google.maps.event.addListener(map, 'bounds_changed', ->
+    google.maps.event.addListener map, 'bounds_changed', ->
       $("#plan_sw_lat").val(map.getBounds().getSouthWest().lat())
       $("#plan_sw_lng").val(map.getBounds().getSouthWest().lng())
       $("#plan_ne_lat").val(map.getBounds().getNorthEast().lat())
       $("#plan_ne_lng").val(map.getBounds().getNorthEast().lng())
-
       $("#new_plan_coordinates").html(map.getCenter().lat() + " " + map.getCenter().lng())
 
 
-      )
-        #alert map.getCenter();
-
-  loadCustomPolygons = (planid) ->
+  loadCustomPolygons = (planId) ->
     customPolygons = {}
     for userpolygon in $(".user_polygon")
       polygonid = $(userpolygon).data('polygon')
@@ -98,48 +93,53 @@ $ ->
         zoom: 10
       map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions)
 
-      for i of data
-        planid = data[i].id
-        name = data[i].name
+      for plan in data
         vertices = []
-        center = centerMap(data[i].polygons)
+        center = centerMap(plan.polygons)
 
-        for polygon in data[i].polygons
+        for polygon in planPolygonsOnly(plan.polygons)
 
-          if polygon.polygontype == "planmap"
-            polygon = drawPolygon(polygon, false, planid)
-            polygon.strokeWeight = 2
-            polygon.strokeColor = '#ffffff'
-            polygon.fillOpacity = 0.8
-            marker = new google.maps.Marker
-              position: new google.maps.LatLng(center[0], center[1])
-              map: map
-              id: polygon.id
-              planid: planid
-              name: name
+          polygon = drawPolygon(polygon, false, plan.id)
+          polygon.strokeWeight = 2
+          polygon.strokeColor = '#ffffff'
+          polygon.fillOpacity = 0.8
+          polygon.fillColor = '#888888'
+          polygon.planName = plan.name
+          marker = new google.maps.Marker
+            position: new google.maps.LatLng(center[0], center[1])
+            map: map
+            planId: plan.id
+            planName: plan.name
 
-            marker.setMap(map)
-            polygon.name = name
-            google.maps.event.addListener(polygon, 'click', showInfo)
-            google.maps.event.addListener(marker, 'click', showInfo)
+          marker.setMap(map)
+          google.maps.event.addListener(polygon, 'click', showPlanInfo)
+          google.maps.event.addListener(marker, 'click', showPlanInfo)
+
+  planPolygonsOnly = (polygons) ->
+    planPolygons = polygons.filter (polygon) ->
+      polygon.polygontype == "planmap"
+    console.log planPolygons
+    planPolygons
+
+  zonePolygonsOnly = (polygons) ->
+    zonePolygons = polygons.filter (polygon) ->
+      polygon.polygontype == "planmap"
+    planPolygons
 
 
-  showInfo = (event) ->
+  showPlanInfo = (event) ->
 
-    id = this.id
-    planid = this.planid
-    name = this.name
-
-    content = "<h4><a href='plans/#{planid}'>#{name}</a></h4>"
+    planId = this.planId
+    planName = this.planName
+    content = "<h4><a href='plans/#{planId}'>#{planName}</a></h4>"
 
     infoWindow.setContent(content)
     infoWindow.setPosition(event.latLng)
     infoWindow.open(map)
 
 
-  setEditable = (polygon) ->
-    polygon.fillOpacity = 0.7
-    polygon.editable = false
+  adminEditPolygon = (polygon) ->
+    polygon.fillOpacity = 0.6
     google.maps.event.addListener(polygon, 'click', showZoneEdit)
     google.maps.event.addListener(polygon, 'mouseover', ->
       this.setEditable(true)
@@ -151,21 +151,11 @@ $ ->
 
 
 
-  setNotEditable = (polygon) ->
-    polygon.fillOpacity = 1
-    polygon.editable = false
-    if $("body.plans.stats").length
-      google.maps.event.addListener(polygon, 'click', showZoneStats)
-    else
-      google.maps.event.addListener(polygon, 'click', showZoneInfo)
-    #if !$("body.home").length
-    #  google.maps.event.addListener(polygon, 'click', showZoneInfo)
-
-
-  drawPolygon = (polygon, editable, planid, customPolygons) ->
+  drawPolygon = (polygon, editable, planId, customPolygons) ->
     vertices = []
 
     zoneid = polygon.zone_id
+    console.log "draw " + zoneid
     description = polygon.description
     polygontype = polygon.polygontype
     if customPolygons? and customPolygons[polygon.id]?
@@ -178,39 +168,62 @@ $ ->
 
 
     polygon = new google.maps.Polygon
-      editable: true
+      editable: false,
       paths: vertices,
       strokeWeight: 0.5,
       zoneid: zoneid,
       fillColor: zones[zoneid].color_code,
-      fillOpacity: 0.5,
+      fillOpacity: 1,
       id: polygon.id,
       description: polygon.description
-      planid: planid
+      planId: planId
       name: polygon.name
-
-    if polygontype == "planmap"
-      polygon.zIndex = 1
-
-
-    else
-      polygon.zIndex = 2
 
     polygon.setMap(map)
     infoWindow = new google.maps.InfoWindow()
-    if editable is true
-      setEditable(polygon)
-    else
-      setNotEditable(polygon)
 
+    switch
+      when $("body.plans.edit").length then adminEditPolygon(polygon)
+      when $("body.plans.show").length
+        google.maps.event.addListener(polygon, 'click', showZoneInfo)
+      when $("body.plans.stats").length
+        google.maps.event.addListener(polygon, 'click', showZoneStats)
+    console.log "drawing"
     polygon
 
+  planmap_bounds = (polygons) ->
+    maxX = Math.max.apply(Math, polygons.map((val) ->
+      val.lat))
+    maxX
+
+  drawingTools = (planId) ->
+    new google.maps.drawing.DrawingManager(
+      drawingMode: google.maps.drawing.OverlayType.POLYGON
+      drawingControl: true
+      drawingControlOptions:
+        position: google.maps.ControlPosition.TOP_CENTER
+        drawingModes: [
+
+          google.maps.drawing.OverlayType.POLYGON,
+
+        ]
 
 
-  DrawZonesTest = (planid) ->
+      polygonOptions:
+        fillColor: '#ffff00'
+        fillOpacity: 1
+        strokeWeight: 1
+        clickable: true
+        editable: true
+        planId: planId
+        zIndex: 1
+      )
+
+  DrawZonesTest = (planId) ->
+
 
     response = $.ajax(
-      url: '/plans/' + planid
+      url: '/plans/' + planId
       dataType: 'json'
       )
 
@@ -235,28 +248,8 @@ $ ->
         center: latlng,
         zoom: 15
       map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions)
-
-      drawingManager = new google.maps.drawing.DrawingManager(
-        drawingMode: google.maps.drawing.OverlayType.POLYGON
-        drawingControl: true
-        drawingControlOptions:
-          position: google.maps.ControlPosition.TOP_CENTER
-          drawingModes: [
-
-            google.maps.drawing.OverlayType.POLYGON,
-
-          ]
-
-
-        polygonOptions:
-          fillColor: '#ffff00'
-          fillOpacity: 1
-          strokeWeight: 1
-          clickable: true
-          editable: true
-          planid: planid
-          zIndex: 1
-      )
+      map.fitBounds(imageBounds)
+      drawingManager = drawingTools(planId)
       drawingManager.setMap map
 
       control = drawControl(map, imageBounds)
@@ -287,7 +280,7 @@ $ ->
 
         resize = "<h5>Set New Image Bounds</h5>"
         content = "<form action='/plans/update_bounds' method='post'>
-                  <input name='id' value='#{planid}' type='hidden'>
+                  <input name='id' value='#{planId}' type='hidden'>
                   <input name='sw_lat' type='hidden' value='#{this.getBounds().getSouthWest().lat()}'>
                   <input name='sw_lng' type='hidden' value='#{this.getBounds().getSouthWest().lng()}'>
                   <input name='ne_lat' type='hidden' value='#{this.getBounds().getNorthEast().lat()}'>
@@ -303,10 +296,10 @@ $ ->
       if data.polygons.length > 0
         for polygon in data.polygons
           if polygon.polygontype == "planmap"
-            drawPolygon(polygon, true, planid)
+            drawPolygon(polygon, true, planId)
         for polygon in data.polygons
           if polygon.polygontype == "zone"
-            drawPolygon(polygon, true, planid)
+            drawPolygon(polygon, true, planId)
 
 
 
@@ -314,10 +307,10 @@ $ ->
         infoWindow = new google.maps.InfoWindow()
 
       google.maps.event.addListener drawingManager, "overlaycomplete", (event) ->
-        overlayClickListener(event.overlay, planid)
+        overlayClickListener(event.overlay, planId)
 
 
-  overlayClickListener = (overlay, planid) ->
+  overlayClickListener = (overlay, planId) ->
     google.maps.event.addListener overlay, "mouseup", (event) ->
 
 
@@ -373,7 +366,7 @@ $ ->
 
     id = this.id
     description = this.description
-    planid = this.planid
+    planId = this.planId
     name = this.name
 
     if this.description is undefined
@@ -402,7 +395,7 @@ $ ->
                 <label><input type='radio' name='polygontype' id='radio_zone' value='zone' checked>Zone</label>
               </div></div>
               <input name='paths' type='hidden' value='#{paths}'>
-              <input name='planid' type='hidden' value='#{planid}'>
+              <input name='planId' type='hidden' value='#{planId}'>
               <input name='id' type='hidden' value='#{id}'>
               <input type='hidden' name='zoneid' value=0>
               <div class='row'>Description:</div>
@@ -434,12 +427,10 @@ $ ->
 
 
 
-  loadAllZones = (planid, customPolygons) ->
-
-
+  loadAllZones = (planId, customPolygons) ->
 
     response = $.ajax(
-      url: '/plans/' + planid
+      url: '/plans/' + planId
       dataType: 'json'
       )
 
@@ -455,24 +446,19 @@ $ ->
 
       for polygon in data.polygons
         if polygon.polygontype == "planmap"
+
           if customPolygons? and customPolygons[polygon.id]?
-            drawPolygon(polygon, false, planid, customPolygons)
+            drawPolygon(polygon, false, planId, customPolygons)
           else
-            drawPolygon(polygon, false, planid)
+            drawPolygon(polygon, false, planId)
 
       for polygon in data.polygons
         if polygon.polygontype == "zone"
           if customPolygons? and customPolygons[polygon.id]?
-            drawPolygon(polygon, false, planid, customPolygons)
+            drawPolygon(polygon, false, planId, customPolygons)
           else
-            drawPolygon(polygon, false, planid)
+            drawPolygon(polygon, false, planId)
 
-
-  getZonesSelectBox = ->
-    selectbox = ""
-    for id of zones
-      selectbox += "<option value=#{id}>#{zones[id].description}</option>"
-    selectbox
 
 
   showZoneStats = (event) ->
@@ -480,7 +466,7 @@ $ ->
     zones_users = {}
     id = this.id
     zoneid = this.zoneid
-    planid = this.planid
+    planId = this.planId
     name = this.name
     description = this.description
     paths = this.getPath().getArray()
@@ -526,23 +512,22 @@ $ ->
 
     id = this.id
     zoneid = this.zoneid
-    planid = this.planid
+    planId = this.planId
     name = this.name
     description = this.description
     paths = this.getPath().getArray()
 
-    $(".zone.#{lastZone}").css('background-color','')
-    $(".zone.#{lastZone} a").css('color','')
+    $(".zone").css('background-color','')
+    $(".zone a").css('color','')
     $(".zone.#{zoneid}").css('background-color','#880000')
     $(".zone.#{zoneid} a").css('color','#ffffff')
-    lastZone = zoneid
 
-    heading = "<h5>Zone:</h5>"
-    content = "<div class='legendbox' style='background-color:" + zones[this.zoneid].color_code + "'></div><div class='row'>" + zones[this.zoneid].classification + "</div></div>
-    <h5>Description:</h5><div class='row'>" + description + "</div>"
+    content = "<h5>Description:</h5><div class='row'>" + description + "</div>"
+
 
     if $("body.plans.userplan").length
-      content = content + "<h5>New Zone:</h5><div class='row'><div id='infoBoxDrop'><h4>Drop Custom Zone here</h4></div></div>
+      content = content + "<h5>Zone:</h5><div class='legendbox' style='background-color:" + zones[this.zoneid].color_code + "'></div><div class='row'>" + zones[this.zoneid].classification + "</div></div>
+      <h5>New Zone:</h5><div class='row'><div id='infoBoxDrop'><h4>Drop Custom Zone here</h4></div></div>
       <h5>New Description:</h5>
       <form action='/plans/userplan/newzone/' method='post'>
       <div class='row'>
@@ -555,7 +540,7 @@ $ ->
       <input type='submit' class='btn btn-primary btn-sm' value='submit'></form>
       </div></div>"
 
-    infoWindow.setContent(heading + content)
+    infoWindow.setContent(content)
     infoWindow.setPosition(event.latLng)
     infoWindow.open(map)
 
@@ -635,11 +620,11 @@ drawGroundOverlay = (map, url, bounds) ->
 
 
 addOverlay = ->
-
+  control.setVisible(true)
   window.overlay.setMap(map)
 
 removeOverlay = ->
-
+  control.setVisible(false)
   window.overlay.setMap(null)
 
 
@@ -667,6 +652,8 @@ zoneTypes = ->
   )
 
   response.done (data) ->
+    console.log "zone types"
+    console.log data
 
     for i of data
 
@@ -677,5 +664,4 @@ zoneTypes = ->
       color_code = data[i].color_code
 
       zones[id] = { code: code, description: description, classification: classification, color_code: color_code}
-
   zones
