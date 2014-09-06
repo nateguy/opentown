@@ -96,14 +96,16 @@ class PlansController < ApplicationController
 
   def modifypolygon
     if params[:id].blank?
-      polygon = Polygon.new(plan_id: params[:planid], polygontype: params[:polygontype], zone_id: params[:zoneid], description: params[:description])
-      polygon.save
+      polygon = Polygon.new(plan_id: params[:planId], polygontype: params[:polygontype], zone_id: params[:zoneid], description: params[:description])
     else
       polygon = Polygon.find(params[:id])
       oldpolygons = Array.new(polygon.vertices)
 
-      planmap_count = Polygon.where(polygontype: "planmap", plan_id: params[:planid]).count
-      if (planmap_count <= 1)
+      allPlanMapPolygons = Polygon.where(polygontype: "planmap", plan_id: params[:planId])
+
+      if (allPlanMapPolygons.count < 1)
+        polygon.polygontype = "planmap"
+      elsif (allPlanMapPolygons.count == 1) && allPlanMapPolygons.exists?(params[:id])
         polygon.polygontype = "planmap"
       else
         polygon.polygontype = params[:polygontype]
@@ -111,9 +113,12 @@ class PlansController < ApplicationController
 
       polygon.zone_id = params[:zoneid]
       polygon.description = params[:description]
-      polygon.save
 
     end
+    if polygon.polygontype.eql? "planmap"
+      polygon.zone_id = 0
+    end
+    polygon.save
 
     @paths = JSON(params[:paths])
     @paths.each do |vertex|

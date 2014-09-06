@@ -7,7 +7,6 @@ myInfoWindow = null          #when our polygon is clicked, a dialog box
 centerpoint = null
 polygon = []
 polygonVertices = {}
-zones = {}
 newOverlay = null
 window.overlay = undefined
 window.img = ''
@@ -121,10 +120,6 @@ $ ->
     console.log planPolygons
     planPolygons
 
-  zonePolygonsOnly = (polygons) ->
-    zonePolygons = polygons.filter (polygon) ->
-      polygon.polygontype == "planmap"
-    planPolygons
 
 
   showPlanInfo = (event) ->
@@ -154,14 +149,14 @@ $ ->
   drawPolygon = (polygon, editable, planId, customPolygons) ->
     vertices = []
 
-    zoneid = polygon.zone_id
-    console.log "draw " + zoneid
-    description = polygon.description
     polygontype = polygon.polygontype
     if customPolygons? and customPolygons[polygon.id]?
 
       zoneid = customPolygons[polygon.id].zoneid
       description = customPolygons[polygon.id].description
+    else
+      zoneid = polygon.zone_id
+      description = polygon.description
 
     for vertex in polygon.vertices
       vertices.push new google.maps.LatLng(vertex.lat, vertex.lng)
@@ -186,9 +181,11 @@ $ ->
       when $("body.plans.edit").length then adminEditPolygon(polygon)
       when $("body.plans.show").length
         google.maps.event.addListener(polygon, 'click', showZoneInfo)
+      when $("body.plans.userplan").length
+        google.maps.event.addListener(polygon, 'click', showZoneInfo)
       when $("body.plans.stats").length
         google.maps.event.addListener(polygon, 'click', showZoneStats)
-    console.log "drawing"
+
     polygon
 
   planmap_bounds = (polygons) ->
@@ -523,10 +520,8 @@ $ ->
     $(".zone.#{zoneid} a").css('color','#ffffff')
 
     content = "<h5>Description:</h5><div class='row'>" + description + "</div>"
-
-
-    if $("body.plans.userplan").length
-      content = content + "<h5>Zone:</h5><div class='legendbox' style='background-color:" + zones[this.zoneid].color_code + "'></div><div class='row'>" + zones[this.zoneid].classification + "</div></div>
+    hiddenInput = "<input type='hidden' name='zoneid'><input type='hidden' value='#{this.id}' name='polygonid'>"
+    userInput = "<h5>Zone:</h5><div class='legendbox' style='background-color:" + zones[this.zoneid].color_code + "'></div><div class='row'>" + zones[this.zoneid].classification + "</div></div>
       <h5>New Zone:</h5><div class='row'><div id='infoBoxDrop'><h4>Drop Custom Zone here</h4></div></div>
       <h5>New Description:</h5>
       <form action='/plans/userplan/newzone/' method='post'>
@@ -534,11 +529,14 @@ $ ->
         <div class='form-group'><textarea placeholder='Describe what should go here instead' name='description' rows='2' class='form-control'></textarea>
         </div>
       </div>
-      <input type='hidden' name='zoneid'>
-      <input type='hidden' value='#{this.id}' name='polygonid'>
+
       <div class='row'><div class='form-group'>
       <input type='submit' class='btn btn-primary btn-sm' value='submit'></form>
       </div></div>"
+
+
+    if $("body.plans.userplan").length
+      content = content + hiddenInput + userInput
 
     infoWindow.setContent(content)
     infoWindow.setPosition(event.latLng)
@@ -645,7 +643,7 @@ centerMap = (polygons) ->
 
 zoneTypes = ->
 
-
+  zones = {}
   response = $.ajax(
     url: '/zones'
     dataType: 'json'
@@ -655,13 +653,13 @@ zoneTypes = ->
     console.log "zone types"
     console.log data
 
-    for i of data
+    for zone in data
 
-      id = data[i].id
-      code = data[i].code
-      description = data[i].description
-      classification = data[i].classification
-      color_code = data[i].color_code
+      id = zone.id
+      code = zone.code
+      description = zone.description
+      classification = zone.classification
+      color_code = zone.color_code
 
       zones[id] = { code: code, description: description, classification: classification, color_code: color_code}
   zones
