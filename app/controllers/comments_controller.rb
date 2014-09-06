@@ -16,9 +16,11 @@ class CommentsController < ApplicationController
 
   def create
     @comment = Comment.new(comment_params)
-
+    @plan = Plan.find(@comment.plan_id)
     if @comment.save
       redirect_to :back, notice: 'Comment was successfully created.'
+
+      #redirect_to plan_path(@plan, tab: 'comments'), notice: 'Comment was successfully created.'
     else
       render :new
     end

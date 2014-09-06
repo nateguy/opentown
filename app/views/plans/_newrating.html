@@ -1,0 +1,51 @@
+
+<!-- Modal -->
+<div class="modal fade" id="newRating" tabindex="-1" role="dialog" aria-labelledby="newRatingLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="newRatingLabel">Rate this Plan</h4>
+
+        <% if user_signed_in? %>
+
+            Signed in as <%= current_user.email %><br>
+            Rating on <%= @plan.name %>
+          </div>
+          <div class="modal-body">
+
+            <%= form_for Rating.new do |f| %>
+
+              <h1 class="choice">0 out of 5</h1>
+              <div class="star-rating">
+                <%= f.radio_button :rating, '1' %><i></i>
+                <%= f.radio_button :rating, '2' %><i></i>
+                <%= f.radio_button :rating, '3' %><i></i>
+                <%= f.radio_button :rating, '4' %><i></i>
+                <%= f.radio_button :rating, '5' %><i></i>
+              </div>
+
+              <div class="field">
+              <%= f.hidden_field :plan_id, value: @plan.id %>
+              </div>
+              <div class="field">
+              <%= f.hidden_field :user_id, value: current_user.id %>
+              </div>
+
+          </div>
+          <div class="modal-footer">
+
+              <%= f.submit "Submit", :class => "btn btn-primary" %>
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+            <% end %>
+        <% else %>
+          </div>
+          <div class="modal-body">
+            You are not signed in
+          </div>
+        <% end %>
+
+    </div>
+  </div>
+</div>

@@ -6,6 +6,7 @@ class User < ActiveRecord::Base
   has_many :comments
   has_many :polygons, :through => :user_polygons
   has_many :likes
+  has_many :ratings
 
   def self.current
     Thread.current[:user]

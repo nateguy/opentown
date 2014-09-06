@@ -1,0 +1,7 @@
+<div class="plan_rating">
+  <div class="row">
+    <h1><%= @plan.ratings.average(:rating) %></h1>
+    <h4>out of 5</h4>
+    <h4><%= @plan.ratings.count %> Votes</h4>
+  </div>
+</div>

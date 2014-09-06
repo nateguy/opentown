@@ -8,7 +8,9 @@
 
       <% if user_signed_in? %>
         <div class="userplan1"><a class="btn-glow" data-toggle='modal' data-target="#newComment">Add Comment</a></div>
-        <div class="userplan1"><%= link_to "Create Custom Plan", plans_userplan_path(id: @plan.id), :class => 'btn-glow' %></div>
+        <div class="userplan1"><a class="btn-glow" data-toggle='modal' data-target="#newRating">Rate Plan</a></div>
+        <div class="userplan1"><%= link_to "Customize Plan", plans_userplan_path(id: @plan.id), :class => 'btn-glow' %></div>
+
       <% end %>
 
     </div>
@@ -18,26 +20,28 @@
       <a class="btn btn-default active" href="#odp" data-toggle="tab">Outline Development Plan</a>
       <a class="btn btn-default" href="#background" data-toggle="tab">Background</a>
       <a class="btn btn-default" href="#comments" data-toggle="tab">Comments</a>
-
+      <a class="btn btn-default" href="#rating" data-toggle="tab">Rating</a>
     </div>
   </div>
 
   <div class="tab-content">
-    <div class="tab-pane active" id="odp">
+    <div class="tab-pane <%= 'active' unless params[:tab] == 'comments' %>" id="odp">
         <%= render partial: 'plans/odp', locals: { plan: @plan } %>
     </div>
     <div class="tab-pane" id="background">
         <%= render partial: 'plans/background', locals: { plan: @plan } %>
     </div>
-    <div class="tab-pane" id="comments">
+    <div class="tab-pane <%= 'active' if params[:tab] == 'comments' %>" id="comments">
         <%= render template: 'comments/show', locals: { plan: @plan } %>
     </div>
-
+    <div class="tab-pane" id="rating">
+        <%= render partial: 'plans/showrating', locals: { plan: @plan } %>
+    </div>
   </div>
-
-
-
-
 </div>
 
+
+
+
+<%= render 'plans/newrating' %>
 <%= render 'plans/newcomment' %>

@@ -360,29 +360,28 @@ $ ->
     $("img[src$='" + imageUrl + "']")
 
   showZoneEdit = (event) ->
+    planId = this.planId; name = this.name
 
-    id = this.id
-    description = this.description
-    planId = this.planId
-    name = this.name
-
-    if this.description is undefined
-          description = ""
-    if id is undefined
-      id = ""
-      content = ""
-    else
+    if this.id?
+      id = this.id; description = this.description
       content = "<div class='row'>Current Zone:</div><div class='row'>
       <div class='legendbox' style='background-color:" + zones[this.zoneid].color_code + "'></div><h5>" + zones[this.zoneid].classification + "</h5></div>"
+    else
+      description = ""; id = ""; content = ""
 
     paths_object = new Array()
     for path in this.getPath().getArray()
       paths_object.push { 'lat': path.lat(), 'lng': path.lng()}
     paths = JSON.stringify(paths_object)
-    console.log paths
-    content = content + "<div class='row'>New Zone:</div>
-              <div class='row'><div id='infoBoxDrop'><h4>Drop Custom Zone here</h4></div></div>
 
+    hiddenInput = "<input name='paths' type='hidden' value='#{paths}'>
+              <input name='planId' type='hidden' value='#{planId}'>
+              <input name='id' type='hidden' value='#{id}'>
+              <input type='hidden' name='zoneid' value=0>"
+
+
+    userInput = "<div class='row'>New Zone:</div>
+              <div class='row'><div id='infoBoxDrop'><h4>Drop Custom Zone here</h4></div></div>
               <form action='/plans/modifypolygon' method='post'>
               <div class='row'>Polygon Type:</div>
               <div class='row'><div class='radio'>
@@ -391,19 +390,16 @@ $ ->
               <div class='radio'>
                 <label><input type='radio' name='polygontype' id='radio_zone' value='zone' checked>Zone</label>
               </div></div>
-              <input name='paths' type='hidden' value='#{paths}'>
-              <input name='planId' type='hidden' value='#{planId}'>
-              <input name='id' type='hidden' value='#{id}'>
-              <input type='hidden' name='zoneid' value=0>
+
               <div class='row'>Description:</div>
               <div class='row'><div class='form-group'>
               <textarea value='#{description}' placeholder='Describe what should go here instead' name='description' rows='2' class='form-control'>
-              </textarea></div></div>
-              <div class='row' id='form_modify_polygon'><input type='submit' value='submit' class='btn btn-primary btn-sm'></form>
+              </textarea></div></div>" + hiddenInput +
+              "<div class='row' id='form_modify_polygon'><input type='submit' value='submit' class='btn btn-primary btn-sm'></form>
               <form action='/plans/deletepolygon/' method='post'><input name='id' type='hidden' value='#{id}'>
               <input type='submit' value='Delete' class='btn btn-primary btn-sm'>
               </div></form>"
-    infoWindow.setContent(content)
+    infoWindow.setContent(content + userInput)
     infoWindow.setPosition(event.latLng)
     infoWindow.open(map)
 
@@ -420,7 +416,6 @@ $ ->
       e.preventDefault()
       false
     )
-
 
 
 
@@ -528,15 +523,14 @@ $ ->
       <div class='row'>
         <div class='form-group'><textarea placeholder='Describe what should go here instead' name='description' rows='2' class='form-control'></textarea>
         </div>
-      </div>
-
-      <div class='row'><div class='form-group'>
+      </div>" + hiddenInput +
+      "<div class='row'><div class='form-group'>
       <input type='submit' class='btn btn-primary btn-sm' value='submit'></form>
       </div></div>"
 
 
     if $("body.plans.userplan").length
-      content = content + hiddenInput + userInput
+      content = content + userInput
 
     infoWindow.setContent(content)
     infoWindow.setPosition(event.latLng)
@@ -565,6 +559,7 @@ $ ->
   $('#plantabs .btn').click ->
     $(this).parent().find('.active').removeClass('active')
     $(this).addClass('active')
+    #initializeMap()
 
   $("#removeOverlay").click ->
     removeOverlay()

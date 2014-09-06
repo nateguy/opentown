@@ -3,13 +3,20 @@
     <div class="col-md-6" id="messagelist">
 
         <ol class="message-item">
-        <% @plan.comments.each do |comment| %>
+
+        <% @plan.comments.reverse.each do |comment| %>
 
 
           <li class="message-item" data-id='comment.id'>
             <div id="message" class="row">
               <div class="header">
-                <span id="user"><%=@users.find(comment.user_id).email %></span>
+                <span id="user">
+                <% if @users.find(comment.user_id).nickname? %>
+                  <%=@users.find(comment.user_id).nickname %>
+                <% else %>
+                  <%=@users.find(comment.user_id).email %>
+                <% end %>
+                </span>
                 <span id="time"><%=time_ago_in_words(comment.created_at) %> ago</span>
               </div>
               <div class="content" id="content<%= comment.id %>"><%=comment.content %></div>

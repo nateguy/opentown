@@ -62,11 +62,11 @@ class PlansController < ApplicationController
     @plans = Plan.all
   end
 
-  def newcomment
-    if user_signed_in?
-      @comment = Comment.new
-    end
-  end
+  # def newcomment
+  #   if user_signed_in?
+  #     @comment = Comment.new
+  #   end
+  # end
 
   def create
     @plan = Plan.new(plan_params)
@@ -182,28 +182,28 @@ class PlansController < ApplicationController
   end
 
 
-  def comment_new
-    if user_signed_in?
-      @plans_comment = Comment.new
-    end
-  end
+  # def comment_new
+  #   if user_signed_in?
+  #     @plans_comment = Comment.new
+  #   end
+  # end
 
 
-  def comment_create
-    if user_signed_in?
-      user_id = User.current.id
-      comments = Comment.new
-      comments.content = params[:content]
-      comments.plan_id = params[:plan_id]
-      comments.user_id = user_id
-      if comments.save == false
-        alert "error"
-        render :comments
-      else
-        redirect_to :back
-      end
-    end
-  end
+  # def comment_create
+  #   if user_signed_in?
+  #     user_id = User.current.id
+  #     comments = Comment.new
+  #     comments.content = params[:content]
+  #     comments.plan_id = params[:plan_id]
+  #     comments.user_id = user_id
+  #     if comments.save == false
+  #       alert "error"
+  #       render :comments
+  #     else
+  #       redirect_to :back, tab: "comments"
+  #     end
+  #   end
+  # end
 
   private
     def set_plan

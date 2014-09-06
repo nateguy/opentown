@@ -1,7 +1,6 @@
 Rails.application.routes.draw do
 
-
-  devise_for :users
+  devise_for :users, :controllers => { registrations: 'registrations' }
   post 'comments/update_comment' => 'comments#update_comment'
   get '/' => "home#index"
   get '/home' => "home#index"
@@ -23,6 +22,7 @@ Rails.application.routes.draw do
   resources :zones
   resources :plans
   resources :comments
+  resources :ratings, only: [:create, :destroy]
   resources :likes, only: [:create, :destroy]
 
   # The priority is based upon order of creation: first created -> highest priority.
