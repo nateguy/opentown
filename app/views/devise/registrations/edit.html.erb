@@ -4,91 +4,115 @@
 <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |f| %>
   <%= devise_error_messages! %>
 
-<div class="row">
-      <%= f.label :nickname, class: "col-md-3 control-label" %>
 
-      <div class="col-md-8">
-        <div class="form-group">
-        <%= f.text_field :nickname, placeholder: 'Nickname', class: "form-control" %>
-        </div>
+  <div class="row">
+    <%= f.label "Account Type", class: "col-md-3 control-label" %>
+
+    <div class="col-md-8">
+      <div class="form-group">
+      <% if current_user.admin %>
+        <%= f.label "Administrator" %>
+      <% else %>
+        <%= f.label "Basic" %>
+      <% end %>
       </div>
     </div>
-    <div class="row">
+  </div>
 
-        <%= f.label :name, class: "col-md-3 control-label" %>
-        <div class="col-md-4">
-          <div class="form-group">
-        <%= f.text_field :first_name, placeholder: 'First Name', class: "form-control" %>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="form-group">
-        <%= f.text_field :last_name, placeholder: 'Last Name', class: "form-control" %>
-          </div>
-        </div>
 
-    </div>
+  <div class="row">
+    <%= f.label :nickname, class: "col-md-3 control-label" %>
 
-    <div class="row">
-      <%= f.label :location, class: "col-md-3 control-label" %>
-
-      <div class="col-md-8">
-        <div class="form-group">
-          <%= f.text_field :location, placeholder: 'Location', class: "form-control" %>
-        </div>
+    <div class="col-md-8">
+      <div class="form-group">
+      <%= f.text_field :nickname, placeholder: 'Nickname', class: "form-control" %>
       </div>
     </div>
-    <div class="row">
-      <%= f.label :email, class: "col-md-3 control-label" %>
+  </div>
+  <div class="row">
 
-      <div class="col-md-8">
-        <div class="form-group">
-          <%= f.email_field :email, placeholder: 'E-mail', autofocus: true, class: "form-control" %>
-        </div>
+    <%= f.label :name, class: "col-md-3 control-label" %>
+    <div class="col-md-4">
+      <div class="form-group">
+    <%= f.text_field :first_name, placeholder: 'First Name', class: "form-control" %>
       </div>
     </div>
+    <div class="col-md-4">
+      <div class="form-group">
+    <%= f.text_field :last_name, placeholder: 'Last Name', class: "form-control" %>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <%= f.label :location, class: "col-md-3 control-label" %>
+    <div class="col-md-8">
+      <div class="form-group">
+        <%= f.text_field :location, placeholder: 'Location', class: "form-control" %>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <%= f.label :email, class: "col-md-3 control-label" %>
+
+    <div class="col-md-8">
+      <div class="form-group">
+        <%= f.email_field :email, placeholder: 'E-mail', autofocus: true, class: "form-control" %>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <%= f.label "Request Admin Permissions", class: "col-md-3 control-label" %>
+
+    <div class="col-md-8">
+      <div class="form-group">
+        <%= f.check_box :need_admin_approval, {}, true, false %>
+      </div>
+    </div>
+  </div>
 
   <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
     <div>Currently waiting confirmation for: <%= resource.unconfirmed_email %></div>
   <% end %>
-    <div class="row">
-      <%= f.label 'Change Password', class: "col-md-3 control-label" %>
+  <div class="row">
+    <%= f.label 'Change Password', class: "col-md-3 control-label" %>
 
-      <div class="col-md-4">
-        <div class="form-group">
-        <%= f.password_field :password, placeholder: 'Enter new password to change', autocomplete: "off", class: "form-control" %>
-        </div>
-      </div>
-
-      <div class="col-md-4">
-        <div class="form-group">
-        <%= f.password_field :password_confirmation, placeholder: 'Confirm password', autocomplete: "off", class: "form-control" %>
-        </div>
+    <div class="col-md-4">
+      <div class="form-group">
+      <%= f.password_field :password, placeholder: 'Enter new password to change', autocomplete: "off", class: "form-control" %>
       </div>
     </div>
 
+    <div class="col-md-4">
+      <div class="form-group">
+      <%= f.password_field :password_confirmation, placeholder: 'Confirm password', autocomplete: "off", class: "form-control" %>
+      </div>
+    </div>
+  </div>
 
 
-    <div class="row">
 
-        <%= f.label :current_password, class: "col-md-3 control-label" %>
-      <div class="col-md-8">
+  <div class="row">
+
+    <%= f.label :current_password, class: "col-md-3 control-label" %>
+    <div class="col-md-8">
       <div class="form-group">
         <%= f.password_field :current_password, placeholder: "We need your current password to confirm your changes", autocomplete: "off", class: "form-control" %>
       </div>
     </div>
   </div>
-    <div class="row">
-      <div class="form-group">
-        <div class="col-md-8">
-
-          <%= f.submit "Update Account", class: "btn btn-default btn-primary"  %>
-              <% end %></div></div></div>
-    <div class="row">
-      <div class="form-group">
-        <div class="col-md-8">
-          <%= button_to "Close Account", registration_path(resource_name), data: { confirm: "Are you sure?" }, method: :delete, class: "btn btn-default btn-default"  %>
-        </div>
+  <div class="row">
+    <div class="form-group">
+      <div class="col-md-8">
+        <%= f.submit "Update Account", class: "btn btn-default btn-primary"  %>
+            <% end %>
       </div>
     </div>
+  </div>
+  <div class="row">
+    <div class="form-group">
+      <div class="col-md-8">
+        <%= button_to "Close Account", registration_path(resource_name), data: { confirm: "Are you sure?" }, method: :delete, class: "btn btn-default btn-default"  %>
+      </div>
+    </div>
+  </div>
 </div>
