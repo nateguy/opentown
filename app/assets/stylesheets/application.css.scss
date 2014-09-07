@@ -47,7 +47,6 @@ body {
 
 #panel {
   h1 {
-    float: left;
     color: #880000;
     margin-top: 0;
     margin-right: 10px;
@@ -55,7 +54,12 @@ body {
 
   .form-control {
     display: inline;
-    width: 40%;
+    width: 80%;
+    max-width: 500px;
+  }
+
+  button {
+    vertical-align:top;
   }
 }
 
