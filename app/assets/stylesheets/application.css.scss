@@ -47,17 +47,16 @@ body {
 
 #panel {
   h1 {
-  float: left;
-  color: #880000;
-  margin-top: 0;
-  margin-right: 10px;
-}
+    float: left;
+    color: #880000;
+    margin-top: 0;
+    margin-right: 10px;
+  }
 
-.form-control {
-  display: inline;
-  width: 40%;
-  min-width: 160px;
-}
+  .form-control {
+    display: inline;
+    width: 40%;
+  }
 }
 
 .navbar-inverse {
