@@ -1,4 +1,5 @@
 class PlansController < ApplicationController
+
   protect_from_forgery with: :null_session,  :except => [:comment, :newuserzone]
   before_action :set_plan, only: [:show, :edit, :update, :destroy]
 
@@ -166,6 +167,7 @@ class PlansController < ApplicationController
   end
 
   def userplan
+
     if user_signed_in?
       plan_id = params[:id]
       @plans = Plan.find(plan_id)
