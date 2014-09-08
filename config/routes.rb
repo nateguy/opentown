@@ -1,6 +1,5 @@
 Rails.application.routes.draw do
 
-  #resources :users, only: [:index]
 
   devise_for :users, :controllers => { registrations: 'registrations' }
   resources :users, :controller => 'users'
@@ -8,9 +7,10 @@ Rails.application.routes.draw do
   get '/' => "home#index"
   get '/home' => "home#index"
   get 'plans/odp/' => 'plans#odp'
-  get 'plans/user_polygons/' => 'plans#user_polygons'
-  get 'plans/userplan/' => 'plans#userplan'
-  post 'plans/userplan/:id' => 'plans#newuserzone'
+#  get 'plans/user_polygons/' => 'plans#user_polygons'
+
+#  get 'plans/userplan/' => 'plans#userplan'
+#  post 'plans/userplan/:id' => 'plans#newuserzone'
   post 'plans/modifypolygon' => 'plans#modifypolygon'
   get 'plans/all' => 'plans#showall'
   get 'plans/stats/' => 'plans#stats'

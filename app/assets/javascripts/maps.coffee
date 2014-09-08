@@ -466,7 +466,7 @@ $ ->
     paths = this.getPath().getArray()
 
     response = $.ajax(
-      url: '/plans/user_polygons'
+      url: '/user_polygons'
       dataType: 'json'
       )
 

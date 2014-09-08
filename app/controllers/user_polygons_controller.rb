@@ -1,6 +1,11 @@
 class UserPolygonsController < ApplicationController
   protect_from_forgery with: :null_session,  :except => [:create]
   before_action :set_user_polygons, only: [:show, :edit, :update, :destroy]
+  before_action :set_user_polygons_all, only: [:index]
+
+  def index
+
+  end
 
   def create
     if user_signed_in?
@@ -42,6 +47,11 @@ class UserPolygonsController < ApplicationController
   end
 
   private
+
+
+  def set_user_polygons_all
+    @user_polygons = UserPolygon.all
+  end
 
   def set_user_polygons
     @users = User.all
