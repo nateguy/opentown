@@ -1,5 +1,9 @@
 class PlansController < ApplicationController
-  load_and_authorize_resource
+
+#  load_and_authorize_resource
+
+
+  protect_from_forgery with: :null_session,  :except => [:modifypolygon]
   before_action :set_plan, only: [:show, :edit, :update, :destroy]
 
   def index
@@ -95,6 +99,7 @@ class PlansController < ApplicationController
   end
 
   def modifypolygon
+
     if params[:id].blank?
       polygon = Polygon.new(plan_id: params[:planId], polygontype: params[:polygontype], zone_id: params[:zoneid], description: params[:description])
     else
