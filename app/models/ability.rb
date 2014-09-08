@@ -6,9 +6,8 @@ class Ability
     if user.admin
         can :manage, :all
     else
-        can [:newuserzone, :user_polygons, :userplan], [Plan, UserPolygon]
-
         can :read, :all
+        cannot :read, User
     end
     # Define abilities for the passed in user here. For example:
     #

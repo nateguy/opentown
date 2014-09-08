@@ -1,6 +1,5 @@
 class PlansController < ApplicationController
-
-  protect_from_forgery with: :null_session,  :except => [:comment, :newuserzone]
+  load_and_authorize_resource
   before_action :set_plan, only: [:show, :edit, :update, :destroy]
 
   def index
@@ -19,9 +18,9 @@ class PlansController < ApplicationController
     @zones = Zone.all
   end
 
-  def user_polygons
-    @user_polygons = UserPolygon.all
-  end
+  # def user_polygons
+  #   @user_polygons = UserPolygon.all
+  # end
 
   def show
     response.headers["Vary"]= "Accept"
@@ -138,50 +137,50 @@ class PlansController < ApplicationController
   end
 
 
-  def newuserzone
-    if user_signed_in?
-      @user_polygons = UserPolygon.all
-      user_polygon = nil
-      polygonid = params[:polygonid]
-      zoneid = params[:zoneid]
-      description = params[:description]
+  # def newuserzone
+  #   if user_signed_in?
+  #     @user_polygons = UserPolygon.all
+  #     user_polygon = nil
+  #     polygonid = params[:polygonid]
+  #     zoneid = params[:zoneid]
+  #     description = params[:description]
 
-      if @user_polygons.exists?(polygon_id: polygonid)
-        user_polygon = @user_polygons.find_by(polygon_id: polygonid)
-        user_polygon.user_id = User.current.id
-        user_polygon.custom_zone = zoneid
-        user_polygon.custom_description = description
-      else
-        user_polygon = UserPolygon.new(polygon_id: polygonid, user_id: User.current.id, custom_description: description, custom_zone: zoneid)
-      end
+  #     if @user_polygons.exists?(polygon_id: polygonid)
+  #       user_polygon = @user_polygons.find_by(polygon_id: polygonid)
+  #       user_polygon.user_id = User.current.id
+  #       user_polygon.custom_zone = zoneid
+  #       user_polygon.custom_description = description
+  #     else
+  #       user_polygon = UserPolygon.new(polygon_id: polygonid, user_id: User.current.id, custom_description: description, custom_zone: zoneid)
+  #     end
 
-      if user_polygon.save
-        redirect_to :back, notice: 'Plan was successfully created.'
-      else
-        render :userplan
-      end
+  #     if user_polygon.save
+  #       redirect_to :back, notice: 'Plan was successfully created.'
+  #     else
+  #       render :userplan
+  #     end
 
 
-    end
+  #   end
 
-  end
+  # end
 
-  def userplan
+  # def userplan
 
-    if user_signed_in?
-      plan_id = params[:id]
-      @plans = Plan.find(plan_id)
-      @zones = Zone.all
+  #   if user_signed_in?
+  #     plan_id = params[:id]
+  #     @plans = Plan.find(plan_id)
+  #     @zones = Zone.all
 
-      @user_polygons = UserPolygon.where(user_id: User.current.id)
+  #     @user_polygons = UserPolygon.where(user_id: User.current.id)
 
-      respond_to do |format|
-        format.html { render :userplan }
-        format.json { render json: @user_polygons }
-      end
-    end
+  #     respond_to do |format|
+  #       format.html { render :userplan }
+  #       format.json { render json: @user_polygons }
+  #     end
+  #   end
 
-  end
+  # end
 
 
   # def comment_new

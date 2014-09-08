@@ -34,7 +34,8 @@ $ ->
       planId = $(".plan_id").data('planid')
       loadAllZones(planId)
 
-    if $("body.plans.userplan").length
+    if $("body.user_polygons.show").length
+
       planId = $(".plan_id").data('planid')
       customPolygons = loadCustomPolygons(planId)
       loadAllZones(planId, customPolygons)
@@ -147,6 +148,7 @@ $ ->
 
 
   drawPolygon = (polygon, editable, planId, customPolygons) ->
+
     vertices = []
 
     polygontype = polygon.polygontype
@@ -181,7 +183,7 @@ $ ->
       when $("body.plans.edit").length then adminEditPolygon(polygon)
       when $("body.plans.show").length
         google.maps.event.addListener(polygon, 'click', showZoneInfo)
-      when $("body.plans.userplan").length
+      when $("body.user_polygons.show").length
         google.maps.event.addListener(polygon, 'click', showZoneInfo)
       when $("body.plans.stats").length
         google.maps.event.addListener(polygon, 'click', showZoneStats)
@@ -519,7 +521,7 @@ $ ->
     userInput = "<h5>Zone:</h5><div class='legendbox' style='background-color:" + zones[this.zoneid].color_code + "'></div><div class='row'>" + zones[this.zoneid].classification + "</div></div>
       <h5>New Zone:</h5><div class='row'><div id='infoBoxDrop'><h4>Drop Custom Zone here</h4></div></div>
       <h5>New Description:</h5>
-      <form action='/plans/userplan/newzone/' method='post'>
+      <form action='/user_polygons' method='post'>
       <div class='row'>
         <div class='form-group'><textarea placeholder='Describe what should go here instead' name='description' rows='2' class='form-control'></textarea>
         </div>
@@ -529,14 +531,14 @@ $ ->
       </div></div>"
 
 
-    if $("body.plans.userplan").length
+    if $("body.user_polygons.show").length
       content = content + userInput
 
     infoWindow.setContent(content)
     infoWindow.setPosition(event.latLng)
     infoWindow.open(map)
 
-    if $("body.plans.userplan").length
+    if $("body.user_polygons.show").length
       infoBoxDrop = document.getElementById("infoBoxDrop")
       infoBoxDrop.addEventListener('dragover' , (e) ->
         e.preventDefault()

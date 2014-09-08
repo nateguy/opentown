@@ -6,10 +6,11 @@
 
 
 
-.plans #map-canvas {
+.plans #map-canvas, .user_polygons #map-canvas {
   height: 500px;
   position: relative;
 }
+
 
 .plans.new #map-canvas {
   height: 300px;

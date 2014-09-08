@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140907163835) do
+ActiveRecord::Schema.define(version: 20140908053851) do
 
   create_table "comments", force: true do |t|
     t.integer  "user_id"
@@ -89,6 +89,7 @@ ActiveRecord::Schema.define(version: 20140907163835) do
     t.string   "location"
     t.boolean  "admin"
     t.boolean  "need_admin_approval"
+    t.boolean  "super_admin"
   end
 
   add_index "users", ["email"], name: "index_users_on_email", unique: true

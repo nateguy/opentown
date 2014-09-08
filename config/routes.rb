@@ -16,7 +16,7 @@ Rails.application.routes.draw do
   get 'plans/stats/' => 'plans#stats'
   post 'plans/update_bounds' => 'plans#update_bounds'
   post 'plans/deletepolygon' => 'plans#deletepolygon'
-
+  resources :user_polygons
 
 
   resources :zones
