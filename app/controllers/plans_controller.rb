@@ -1,10 +1,11 @@
 class PlansController < ApplicationController
 
-#  load_and_authorize_resource
+
 
 
   protect_from_forgery with: :null_session,  :except => [:modifypolygon]
   before_action :set_plan, only: [:show, :edit, :update, :destroy]
+  load_and_authorize_resource except: [:update_bounds]
 
   def index
 
@@ -13,6 +14,10 @@ class PlansController < ApplicationController
   def new
     @plan = Plan.new
 
+  end
+
+  def create
+    @plan = Plan.new(plan_params)
   end
 
 
@@ -44,15 +49,7 @@ class PlansController < ApplicationController
     end
   end
 
-  def update_bounds
-    @plan = Plan.find(params[:id])
-    @plan.sw_lng = params[:sw_lng]
-    @plan.sw_lat = params[:sw_lat]
-    @plan.ne_lng = params[:ne_lng]
-    @plan.ne_lat = params[:ne_lat]
-    @plan.save
-    redirect_to :back
-  end
+
 
   def destroy
     @plan.destroy
@@ -210,8 +207,22 @@ class PlansController < ApplicationController
   #     end
   #   end
   # end
+    def update_bounds
+
+      @plan = Plan.find(params[:id])
+
+      @plan.sw_lng = params[:sw_lng]
+      @plan.sw_lat = params[:sw_lat]
+      @plan.ne_lng = params[:ne_lng]
+      @plan.ne_lat = params[:ne_lat]
+      @plan.save
+      redirect_to :back
+    end
 
   private
+
+
+
     def set_plan
       @plan = Plan.find(params[:id])
       @zones = Zone.all
