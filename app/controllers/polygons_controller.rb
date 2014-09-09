@@ -1,5 +1,5 @@
 class PolygonsController < ApplicationController
-  protect_from_forgery with: :null_session,  :except => [:create_update, :delete]
+  protect_from_forgery with: :null_session,  :except => [:create, :update, :delete]
   #before_action :set_polygon, only: [:show, :edit, :update, :destroy]
 
   def delete
