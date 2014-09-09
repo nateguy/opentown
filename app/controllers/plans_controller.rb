@@ -5,7 +5,7 @@ class PlansController < ApplicationController
 
   protect_from_forgery with: :null_session,  :except => [:modifypolygon]
   before_action :set_plan, only: [:show, :edit, :update, :destroy]
-  load_and_authorize_resource except: [:update_bounds]
+  #load_and_authorize_resource except: [:update_bounds]
 
   def index
 
