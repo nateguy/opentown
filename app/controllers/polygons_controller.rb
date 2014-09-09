@@ -9,11 +9,15 @@ class PolygonsController < ApplicationController
     redirect_to :back
   end
 
+
+
+
+
   def create
     polygon = Polygon.new(plan_id: params[:planId], polygontype: params[:polygontype], zone_id: params[:zoneid], description: params[:description])
 
     polygon.polygontype = "planmap" if (Polygon.where(polygontype: "planmap", plan_id: params[:planId]).count < 1)
-    polygon.zone_id = 0 if polygon.polygontype.eql? "planmap"
+    polygon.zone_id = return_planmap_id if polygon.polygontype.eql? "planmap"
     polygon.save
     paths = JSON(params[:paths])
     generate_vertices(polygon, paths)
@@ -34,7 +38,7 @@ class PolygonsController < ApplicationController
     end
 
     zone_id = params[:zoneid]
-    zone_id = 0 if polygon.polygontype.eql? "planmap"
+    zone_id = return_planmap_id if polygon.polygontype.eql? "planmap"
     polygon.update(polygontype: polygontype, description: params[:description], zone_id: zone_id)
 
 
@@ -48,6 +52,11 @@ class PolygonsController < ApplicationController
 
 
   private
+
+    def return_planmap_id
+      @zone = Zone.find_by(code: "planmap")
+      return @zone.id
+    end
 
     def generate_vertices(polygon, paths)
 
