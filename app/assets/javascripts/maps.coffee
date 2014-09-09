@@ -367,8 +367,10 @@ $ ->
     if this.id?
       id = this.id; description = this.description
       content = "<div class='row'>What's this?</div><div class='row'>" + description + "</div>"
+      form_action = 'update'
     else
       description = ""; id = ""; content = ""
+      form_action = 'create'
 
     paths_object = new Array()
     for path in this.getPath().getArray()
@@ -383,7 +385,7 @@ $ ->
 
     userInput = "<div class='row'>Set new zone:</div>
               <div class='row'><div id='infoBoxDrop'><h4>Drop new zone here</h4></div></div>
-              <form action='/polygons/create_update' method='post'>
+              <form action='/polygons/#{form_action}' method='post'>
               <div class='row'><div class='radio'>
                 <label class='small'><input type='radio' name='polygontype' id='radio_planmap' value='planmap'>Plan Layout</label>
               </div>

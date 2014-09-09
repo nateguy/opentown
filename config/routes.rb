@@ -7,19 +7,16 @@ Rails.application.routes.draw do
   get '/' => "home#index"
   get '/home' => "home#index"
   get 'plans/odp/' => 'plans#odp'
-#  get 'plans/user_polygons/' => 'plans#user_polygons'
-
-#  get 'plans/userplan/' => 'plans#userplan'
-#  post 'plans/userplan/:id' => 'plans#newuserzone'
-  post 'plans/modifypolygon' => 'plans#modifypolygon'
   get 'plans/all' => 'plans#showall'
   get 'plans/stats/' => 'plans#stats'
   post 'plans/update_bounds' => 'plans#update_bounds'
-  post 'plans/deletepolygon' => 'plans#deletepolygon'
-  post 'polygons/create_update' => 'polygons#create_update'
+
+
+  post 'polygons/update' => 'polygons#update'
+  post 'polygons/create' => 'polygons#create'
   post 'polygons/delete' => 'polygons#delete'
   resources :user_polygons
-  resources :polygons, only: [:create, :destroy, :update]
+  #resources :polygons, only: [:create, :destroy, :update]
 
   resources :zones
   resources :plans

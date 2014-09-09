@@ -9,52 +9,62 @@ class PolygonsController < ApplicationController
     redirect_to :back
   end
 
-  def create_update
+  def create
+    polygon = Polygon.new(plan_id: params[:planId], polygontype: params[:polygontype], zone_id: params[:zoneid], description: params[:description])
 
-    if params[:id].blank?
-      polygon = Polygon.new(plan_id: params[:planId], polygontype: params[:polygontype], zone_id: params[:zoneid], description: params[:description])
-    else
-      polygon = Polygon.find(params[:id])
-      oldpolygons = Array.new(polygon.vertices)
-
-      allPlanMapPolygons = Polygon.where(polygontype: "planmap", plan_id: params[:planId])
-
-      if (allPlanMapPolygons.count < 1)
-        polygon.polygontype = "planmap"
-      elsif (allPlanMapPolygons.count == 1) && allPlanMapPolygons.exists?(params[:id])
-        polygon.polygontype = "planmap"
-      else
-        polygon.polygontype = params[:polygontype]
-      end
-
-      polygon.zone_id = params[:zoneid]
-      polygon.description = params[:description]
-
-    end
-    if polygon.polygontype.eql? "planmap"
-      polygon.zone_id = 0
-    end
+    polygon.polygontype = "planmap" if (Polygon.where(polygontype: "planmap", plan_id: params[:planId]).count < 1)
+    polygon.zone_id = 0 if polygon.polygontype.eql? "planmap"
     polygon.save
+    paths = JSON(params[:paths])
+    generate_vertices(polygon, paths)
+    redirect_to :back
+  end
 
-    @paths = JSON(params[:paths])
-    @paths.each do |vertex|
+  def update
 
-      new_vertex = polygon.vertices.new(lat: vertex["lat"], lng: vertex["lng"], todelete: false)
-      new_vertex.save
+    polygon = Polygon.find(params[:id])
+
+    planMapPolygons = Polygon.where(polygontype: "planmap", plan_id: params[:planId])
+
+
+    if (planMapPolygons.count < 1) || ((planMapPolygons.count == 1)&&(polygon.polygontype == "planmap"))
+      polygontype = "planmap"
+    else
+      polygontype = params[:polygontype]
     end
 
-    unless oldpolygons.blank?
-      oldpolygons.each do |old_vertex|
-        polygon.vertices.find(old_vertex.id).destroy
-      end
-    end
+    zone_id = params[:zoneid]
+    zone_id = 0 if polygon.polygontype.eql? "planmap"
+    polygon.update(polygontype: polygontype, description: params[:description], zone_id: zone_id)
+
+
+    paths = JSON(params[:paths])
+
+    destroy_old_vertices(polygon, Array.new(polygon.vertices))
+    generate_vertices(polygon, paths)
 
     redirect_to :back
   end
 
+
   private
 
+    def generate_vertices(polygon, paths)
 
+      paths.each do |vertex|
+
+        new_vertex = polygon.vertices.new(lat: vertex["lat"], lng: vertex["lng"], todelete: false)
+        new_vertex.save
+      end
+    end
+
+    def destroy_old_vertices(polygon, paths)
+      unless paths.blank?
+        paths.each do |vertex|
+          polygon.vertices.find(vertex.id).destroy
+        end
+      end
+    end
 
     def set_polygon
       @polygon = Polygon.find(params[:id])
@@ -62,6 +72,6 @@ class PolygonsController < ApplicationController
     end
 
     def polygon_params
-      params.require(:plan).permit(:plan_id, :polygontype, :zone_id, :description, :vertices)
+      params.require(:polygon).permit(:plan_id, :polygontype, :zone_id, :description, :vertices)
     end
 end
