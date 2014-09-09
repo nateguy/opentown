@@ -366,8 +366,7 @@ $ ->
 
     if this.id?
       id = this.id; description = this.description
-      content = "<div class='row'>Current Zone:</div><div class='row'>
-      <div class='legendbox' style='background-color:" + zones[this.zoneid].color_code + "'></div><h5>" + zones[this.zoneid].classification + "</h5></div>"
+      content = "<div class='row'>What's this?</div><div class='row'>" + description + "</div>"
     else
       description = ""; id = ""; content = ""
 
@@ -382,23 +381,22 @@ $ ->
               <input type='hidden' name='zoneid' value=0>"
 
 
-    userInput = "<div class='row'>New Zone:</div>
-              <div class='row'><div id='infoBoxDrop'><h4>Drop Custom Zone here</h4></div></div>
-              <form action='/plans/modifypolygon' method='post'>
-              <div class='row'>Polygon Type:</div>
+    userInput = "<div class='row'>Set new zone:</div>
+              <div class='row'><div id='infoBoxDrop'><h4>Drop new zone here</h4></div></div>
+              <form action='/polygons/create_update' method='post'>
               <div class='row'><div class='radio'>
-                <label><input type='radio' name='polygontype' id='radio_planmap' value='planmap'>Plan Layout</label>
+                <label class='small'><input type='radio' name='polygontype' id='radio_planmap' value='planmap'>Plan Layout</label>
               </div>
               <div class='radio'>
-                <label><input type='radio' name='polygontype' id='radio_zone' value='zone' checked>Zone</label>
+                <label class='small'><input type='radio' name='polygontype' id='radio_zone' value='zone' checked>Zone</label>
               </div></div>
 
-              <div class='row'>Description:</div>
+              <div class='row'>Set new description:</div>
               <div class='row'><div class='form-group'>
               <textarea value='#{description}' placeholder='Describe what should go here instead' name='description' rows='2' class='form-control'>
               </textarea></div></div>" + hiddenInput +
               "<div class='row' id='form_modify_polygon'><input type='submit' value='submit' class='btn btn-primary btn-sm'></form>
-              <form action='/plans/deletepolygon/' method='post'><input name='id' type='hidden' value='#{id}'>
+              <form action='/polygons/delete' method='post'><input name='id' type='hidden' value='#{id}'>
               <input type='submit' value='Delete' class='btn btn-primary btn-sm'>
               </div></form>"
     infoWindow.setContent(content + userInput)
