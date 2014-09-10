@@ -260,16 +260,22 @@ $ ->
 
       google.maps.event.addListener(control, 'bounds_changed', boundsChangedHandler)
       google.maps.event.addListener(control, 'rightclick', (e) ->
-        height = (data.ne_lat - data.sw_lat)
+        imageBounds = this.getBounds()
+        current_ne_lat = imageBounds.getNorthEast().lat()
+        current_sw_lat = imageBounds.getSouthWest().lat()
+        current_sw_lng = imageBounds.getSouthWest().lng()
+        current_ne_lng = imageBounds.getNorthEast().lng()
+
+        height = (current_ne_lat - current_sw_lat)
         width = height * (overlayImage.width / overlayImage.height)
 
-        center_lng = (data.sw_lng + data.ne_lng) / 2
+        center_lng = (current_sw_lng + current_ne_lng) / 2
         new_sw_lng = center_lng - (width / 2)
         new_ne_lng = center_lng + (width / 2)
 
         imageBounds = new google.maps.LatLngBounds(
-          new google.maps.LatLng(data.sw_lat,new_sw_lng)
-          new google.maps.LatLng(data.ne_lat,new_ne_lng))
+          new google.maps.LatLng(current_sw_lat,new_sw_lng)
+          new google.maps.LatLng(current_ne_lat,new_ne_lng))
         this.bounds = imageBounds
       )
 
