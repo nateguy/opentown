@@ -88,24 +88,23 @@ $ ->
     response.done (data) ->
       latlng = new google.maps.LatLng(22.297256, 113.948430)
       mapOptions =
-        center: latlng,
+        center: latlng
         zoom: 10
       map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions)
 
       for plan in data
         vertices = []
-        center = centerMap(plan.polygons)
 
         for polygon in planPolygonsOnly(plan.polygons)
 
-          polygon = drawPolygon(polygon, false, plan.id)
+          polygon = drawPolygon(polygon, plan.id)
           polygon.strokeWeight = 2
           polygon.strokeColor = '#ffffff'
           polygon.fillOpacity = 0.8
           polygon.fillColor = '#888888'
           polygon.planName = plan.name
           marker = new google.maps.Marker
-            position: new google.maps.LatLng(center[0], center[1])
+            position: planmap_bounds(plan.polygons).getCenter()
             map: map
             planId: plan.id
             planName: plan.name
@@ -114,10 +113,7 @@ $ ->
           google.maps.event.addListener(polygon, 'click', showPlanInfo)
           google.maps.event.addListener(marker, 'click', showPlanInfo)
 
-  planPolygonsOnly = (polygons) ->
-    planPolygons = polygons.filter (polygon) ->
-      polygon.polygontype == "planmap"
-    planPolygons
+
 
 
 
@@ -146,7 +142,7 @@ $ ->
 
 
 
-  drawPolygon = (polygon, editable, planId, customPolygons) ->
+  drawPolygon = (polygon, planId, customPolygons) ->
 
     vertices = []
 
@@ -176,6 +172,10 @@ $ ->
       name: polygon.name
 
     polygon.setMap(map)
+    # if polygon.polygontype = "planmap"
+    #   console.log "setting map"
+    #   map.fitBounds(polygon.getBounds())
+
     infoWindow = new google.maps.InfoWindow()
 
     switch
@@ -192,37 +192,7 @@ $ ->
 
 
 
-  planmap_bounds = (polygons) ->
 
-    polygon = polygons.filter((polygon) ->
-          polygon.polygontype == "planmap"
-          )[0]
-
-    # tt = polygons.filter((polygon) ->
-    #       polygon.polygontype == "planmap"
-    #       )
-    # console.log tt
-    # test = [].map.call(tt, (obj) ->
-    #   obj.vertices)
-    # console.log test
-
-    max_lat = Math.max.apply(Math, polygon.vertices.map(
-      (val) ->
-        val.lat))
-    max_lng = Math.max.apply(Math, polygon.vertices.map(
-      (val) ->
-        val.lng))
-    min_lat = Math.min.apply(Math, polygon.vertices.map(
-      (val) ->
-        val.lat))
-    min_lng = Math.min.apply(Math, polygon.vertices.map(
-      (val) ->
-        val.lng))
-
-
-    imageBounds = new google.maps.LatLngBounds(
-        new google.maps.LatLng(min_lat,min_lng)
-        new google.maps.LatLng(max_lat,max_lng))
 
   drawingTools = (planId) ->
     new google.maps.drawing.DrawingManager(
@@ -261,17 +231,8 @@ $ ->
       imageBounds = new google.maps.LatLngBounds(
         new google.maps.LatLng(data.sw_lat,data.sw_lng)
         new google.maps.LatLng(data.ne_lat,data.ne_lng))
-      if data.polygons.length > 0
 
-        center = centerMap(data.polygons)
-        center_lng = center[1]
-        center_lat = center[0]
-        #latlng = new google.maps.LatLng(center[0], center[1])
-      else
-        center_lng = (data.ne_lng + data.sw_lng) / 2
-        center_lat = (data.ne_lat + data.sw_lat) / 2
-
-      latlng = new google.maps.LatLng(center_lat,center_lng)
+      latlng = imageBounds.getCenter()
       mapOptions =
         center: latlng,
         zoom: 15
@@ -330,12 +291,10 @@ $ ->
 
 
       if data.polygons.length > 0
-        for polygon in data.polygons
-          if polygon.polygontype == "planmap"
-            drawPolygon(polygon, true, planId)
-        for polygon in data.polygons
-          if polygon.polygontype == "zone"
-            drawPolygon(polygon, true, planId)
+        for polygon in planPolygonsOnly(data.polygons)
+            drawPolygon(polygon, planId)
+        for polygon in zonePolygonsOnly(data.polygons)
+            drawPolygon(polygon, planId)
 
 
 
@@ -399,6 +358,7 @@ $ ->
     $("img[src$='" + imageUrl + "']")
 
   showZoneEdit = (event) ->
+
     planId = this.planId; name = this.name
 
     if this.id?
@@ -413,6 +373,9 @@ $ ->
     for path in this.getPath().getArray()
       paths_object.push { 'lat': path.lat(), 'lng': path.lng()}
     paths = JSON.stringify(paths_object)
+
+
+    console.log this.getPath().getArray()
 
     hiddenInput = "<input name='paths' type='hidden' value='#{paths}'>
               <input name='planId' type='hidden' value='#{planId}'>
@@ -466,28 +429,29 @@ $ ->
       )
 
     response.done (data) ->
-      center = centerMap(data.polygons)
-      latlng = new google.maps.LatLng(center[0], center[1])
+      bounds = planmap_bounds(data.polygons)
+
+      latlng = bounds.getCenter()
       mapOptions =
         center: latlng,
         zoom: 15
       map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions)
-      map.fitBounds(planmap_bounds(data.polygons))
+      map.fitBounds(bounds)
 
       for polygon in planPolygonsOnly(data.polygons)
 
+        if customPolygons? and customPolygons[polygon.id]?
+          drawPolygon(polygon, planId, customPolygons)
+        else
+          drawPolygon(polygon, planId)
+
+
+      for polygon in zonePolygonsOnly(data.polygons)
 
         if customPolygons? and customPolygons[polygon.id]?
-          drawPolygon(polygon, false, planId, customPolygons)
+          drawPolygon(polygon, planId, customPolygons)
         else
-          drawPolygon(polygon, false, planId)
-
-      for polygon in data.polygons
-        if polygon.polygontype == "zone"
-          if customPolygons? and customPolygons[polygon.id]?
-            drawPolygon(polygon, false, planId, customPolygons)
-          else
-            drawPolygon(polygon, false, planId)
+          drawPolygon(polygon, planId)
 
 
 
@@ -539,6 +503,7 @@ $ ->
 
 
   showZoneInfo = (event) ->
+    console.log "this"
 
     id = this.id
     zoneid = this.zoneid
@@ -624,6 +589,35 @@ $ ->
         else
             alert "geocode not successful"
 
+  google.maps.Polygon.prototype.getBounds = ->
+    bounds = new google.maps.LatLngBounds()
+    console.log this.getPath()
+    this.getPath().forEach (element,index) ->
+      bounds.extend(element)
+    bounds
+
+
+
+planPolygonsOnly = (polygons) ->
+  planPolygons = polygons.filter (polygon) ->
+    polygon.polygontype == "planmap"
+
+zonePolygonsOnly = (polygons) ->
+  planPolygons = polygons.filter (polygon) ->
+    polygon.polygontype == "zone"
+
+
+
+planmap_bounds = (polygons) ->
+
+  #all_vertices = new Array
+  bounds = new google.maps.LatLngBounds()
+
+  for polygon in planPolygonsOnly(polygons)
+    for vertex in polygon.vertices
+      bounds.extend new google.maps.LatLng(vertex.lat, vertex.lng)
+
+  bounds
 
 boundsChangedHandler = (e) ->
   window.overlay.setMap(null) if window.overlay
@@ -659,20 +653,6 @@ removeOverlay = ->
   window.overlay.setMap(null)
 
 
-centerMap = (polygons) ->
-  for polygon in polygons
-
-    if polygon.polygontype == "planmap"
-
-      vertices = polygon.vertices
-      lats = vertices.map (vertex) ->
-        vertex.lat
-      lngs = vertices.map (vertex) ->
-        vertex.lng
-      lats_avg = (lats.reduce (t, s) -> t + s) / lats.length
-      lngs_avg = (lngs.reduce (t, s) -> t + s) / lngs.length
-
-  [lats_avg, lngs_avg]
 
 zoneTypes = ->
 
