@@ -17,7 +17,6 @@ $ ->
 
   newOverlay = null
   zones = zoneTypes()
-  console.log zones
 
   initializeMap = ->
 
@@ -118,7 +117,6 @@ $ ->
   planPolygonsOnly = (polygons) ->
     planPolygons = polygons.filter (polygon) ->
       polygon.polygontype == "planmap"
-    console.log planPolygons
     planPolygons
 
 
@@ -142,6 +140,7 @@ $ ->
       )
     google.maps.event.addListener(polygon, 'mouseout', ->
       this.setEditable(false)
+
       )
     addDeleteButton(polygon, 'http://i.imgur.com/RUrKV.png')
 
@@ -190,10 +189,40 @@ $ ->
 
     polygon
 
+
+
+
   planmap_bounds = (polygons) ->
-    maxX = Math.max.apply(Math, polygons.map((val) ->
-      val.lat))
-    maxX
+
+    polygon = polygons.filter((polygon) ->
+          polygon.polygontype == "planmap"
+          )[0]
+
+    # tt = polygons.filter((polygon) ->
+    #       polygon.polygontype == "planmap"
+    #       )
+    # console.log tt
+    # test = [].map.call(tt, (obj) ->
+    #   obj.vertices)
+    # console.log test
+
+    max_lat = Math.max.apply(Math, polygon.vertices.map(
+      (val) ->
+        val.lat))
+    max_lng = Math.max.apply(Math, polygon.vertices.map(
+      (val) ->
+        val.lng))
+    min_lat = Math.min.apply(Math, polygon.vertices.map(
+      (val) ->
+        val.lat))
+    min_lng = Math.min.apply(Math, polygon.vertices.map(
+      (val) ->
+        val.lng))
+
+
+    imageBounds = new google.maps.LatLngBounds(
+        new google.maps.LatLng(min_lat,min_lng)
+        new google.maps.LatLng(max_lat,max_lng))
 
   drawingTools = (planId) ->
     new google.maps.drawing.DrawingManager(
@@ -250,6 +279,8 @@ $ ->
       map.fitBounds(imageBounds)
       drawingManager = drawingTools(planId)
       drawingManager.setMap map
+
+
 
       control = drawControl(map, imageBounds)
       window.img = data.overlay
@@ -441,16 +472,15 @@ $ ->
         center: latlng,
         zoom: 15
       map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions)
+      map.fitBounds(planmap_bounds(data.polygons))
+
+      for polygon in planPolygonsOnly(data.polygons)
 
 
-
-      for polygon in data.polygons
-        if polygon.polygontype == "planmap"
-
-          if customPolygons? and customPolygons[polygon.id]?
-            drawPolygon(polygon, false, planId, customPolygons)
-          else
-            drawPolygon(polygon, false, planId)
+        if customPolygons? and customPolygons[polygon.id]?
+          drawPolygon(polygon, false, planId, customPolygons)
+        else
+          drawPolygon(polygon, false, planId)
 
       for polygon in data.polygons
         if polygon.polygontype == "zone"
@@ -653,8 +683,6 @@ zoneTypes = ->
   )
 
   response.done (data) ->
-    console.log "zone types"
-    console.log data
 
     for zone in data
 
