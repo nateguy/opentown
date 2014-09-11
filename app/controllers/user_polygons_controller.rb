@@ -15,7 +15,7 @@ class UserPolygonsController < ApplicationController
       description = params[:description]
 
       if @user_polygons.exists?(polygon_id: polygonid, user_id: User.current.id)
-        user_polygon = @user_polygons.find_by(polygon_id: polygonid)
+        user_polygon = @user_polygons.find_by(polygon_id: polygonid, user_id: User.current.id)
         user_polygon.user_id = User.current.id
         user_polygon.custom_zone = zoneid
         user_polygon.custom_description = description

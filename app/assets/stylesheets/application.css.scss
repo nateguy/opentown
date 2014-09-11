@@ -102,6 +102,20 @@ label .small {
 }
 
 
+#infoBoxDrop {
+
+  padding: 5px 0px 5px 5px;
+  margin-bottom: 5px;
+  border-radius: 5px;
+  border-style: dotted;
+  border-color: #cccccc;
+  color: #cccccc;
+
+  .zonebox h5 {
+    color: #000000;
+  }
+}
+
 h1 {
   font-size: 25px;
 

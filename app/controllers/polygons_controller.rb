@@ -33,12 +33,12 @@ class PolygonsController < ApplicationController
 
     if (planMapPolygons.count < 1) || ((planMapPolygons.count == 1)&&(polygon.polygontype == "planmap"))
       polygontype = "planmap"
-    else
-      polygontype = params[:polygontype]
+    elsif params[:zoneid] = return_planmap_id
+      polygontype = "planmap"
     end
+      polygontype = "zone"
 
     zone_id = params[:zoneid]
-    zone_id = return_planmap_id if polygon.polygontype.eql? "planmap"
     polygon.update(polygontype: polygontype, description: params[:description], zone_id: zone_id)
 
 

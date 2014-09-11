@@ -18,6 +18,7 @@ $ ->
   newOverlay = null
   zones = zoneTypes()
 
+
   initializeMap = ->
 
     geocoder = new google.maps.Geocoder()
@@ -86,6 +87,9 @@ $ ->
     )
 
     response.done (data) ->
+
+
+
       latlng = new google.maps.LatLng(22.297256, 113.948430)
       mapOptions =
         center: latlng
@@ -144,11 +148,13 @@ $ ->
 
   drawPolygon = (polygon, planId, customPolygons) ->
 
+    console.log polygon.id
+    console.log customPolygons
     vertices = []
 
     polygontype = polygon.polygontype
     if customPolygons? and customPolygons[polygon.id]?
-
+      console.log customPolygons[polygon.id]
       zoneid = customPolygons[polygon.id].zoneid
       description = customPolygons[polygon.id].description
     else
@@ -502,8 +508,14 @@ $ ->
       infoWindow.open(map)
 
 
+
   showZone = (event) ->
-    console.log "this"
+    console.log zones
+
+    planMapZoneId = ->
+      for id in Object.keys(zones)
+        if zones[id]['code'] == "planmap"
+          return id
 
     id = this.id
     zoneid = this.zoneid
@@ -515,7 +527,6 @@ $ ->
     for path in this.getPath().getArray()
       paths_object.push { 'lat': path.lat(), 'lng': path.lng()}
     paths = JSON.stringify(paths_object)
-
 
 
     $(".zone").css('background-color','')
@@ -530,44 +541,42 @@ $ ->
       edit_form_tag = "<form action='/polygons/update' method='post'>"
 
     else
-      description = ""; id = ""; description_tag = ""; zoneid = 0
+      description = ""; id = ""; description_tag = ""; zoneid = planMapZoneId()
       edit_form_tag = "<form action='/polygons/create' method='post'>"
 
-    header_tag = "<div class='row'>What's this?</div>"
+    header_tag = "<div class='row'><h5>What's this?</h5></div>"
     form_zoneid_tag = "<input type='hidden' name='zoneid' value='#{zoneid}'>"
     # same thing different name
     form_id_tag = "<input type='hidden' value='#{id}' name='id'>"
     form_polygonid_tag = "<input type='hidden' value='#{id}' name='polygonid'>"
 
-    form_paths_tag = "<input name='hidden' type='hidden' value='#{paths}'>"
+    form_paths_tag = "<input name='paths' type='hidden' value='#{paths}'>"
     form_planid_tag = "<input name='planId' type='hidden' value='#{planId}'>"
-    form_polygontype_tag = "<div class='row'><div class='radio'>
-                <label class='small'><input type='radio' name='polygontype' id='radio_planmap' value='planmap'>Plan Layout</label>
-              </div>
-              <div class='radio'>
-                <label class='small'><input type='radio' name='polygontype' id='radio_zone' value='zone' checked>Zone</label>
-              </div></div>"
-    form_zoneDropBox_tag = "<h5>Set Zone:</h5>
+
+    form_zoneDropBox_tag = "<div class='row'><h5>Set new zone or plan outline and description:</h5></div>
       <div class='row'><div id='infoBoxDrop'><h4>Drop Custom Zone here</h4></div></div>"
 
 
     userpolygon_form_tag = "<form action='/user_polygons' method='post'>"
-    form_description_tag = "<h5>Set Description:</h5><div class='row'>
+    form_description_tag = "<div class='row'>
         <div class='form-group'><textarea placeholder='Describe what should go here instead' name='description' rows='2' class='form-control'></textarea>
         </div>
       </div>"
-    form_submit_tag = "<div class='row'><div class='form-group'>
-      <input type='submit' class='btn btn-primary btn-sm' value='submit'></form>
-      </div></div>"
+    form_submit_tag = "<div class='row' id='form_modify_polygon'>
+      <input type='submit' class='btn btn-primary btn-sm' value='submit'></form>"
+    form_delete_tag = "<form action='/polygons/delete' method='post'><input name='id' type='hidden' value='#{id}'>
+                <input type='submit' value='Delete' class='btn btn-primary btn-sm'>
+                </div></form>"
+
 
 
 
     content = header_tag + description_tag
 
     if $("body.plans.edit").length
-      content = content + form_zoneDropBox_tag + edit_form_tag + form_description_tag + form_polygontype_tag + form_paths_tag + form_planid_tag + form_id_tag + form_zoneid_tag + form_submit_tag
+      content = content + form_zoneDropBox_tag + edit_form_tag + form_description_tag + form_paths_tag + form_planid_tag + form_id_tag + form_zoneid_tag + form_submit_tag + form_delete_tag
     if $("body.user_polygons.show").length
-      content = content + form_zoneDropBox_tag + userpolygon_form_tag + form_description_tag + form_zoneid_tag + form_polygonid_tag + form_submit_tag
+      content = content + form_zoneDropBox_tag + userpolygon_form_tag + form_description_tag + form_zoneid_tag + form_polygonid_tag + form_submit_tag + "</div>"
     if $("body.plans.show").length
       content = content
 
@@ -587,8 +596,8 @@ $ ->
 
         newzone = e.dataTransfer.getData("text/plain")
         $("input[name='zoneid']").val(newzone)
-        $("#infoBoxDrop").html("<div class='legendbox' style='background-color:" + zones[newzone].color_code + "'></div>
-          <h5>" + zones[newzone].classification + "</h5>")
+        $("#infoBoxDrop").html("<div class='zonebox'><div class='legendbox' style='background-color:" + zones[newzone].color_code + "'></div>
+          <h5>" + zones[newzone].classification + "</h5></div>")
         e.preventDefault()
         false
       )
@@ -690,7 +699,10 @@ $ ->
       bounds.extend(element)
     bounds
 
-
+planPolygonId = (zones) ->
+  i = zones.filter
+    polygontype: "planmap"
+  console.log i
 
 planPolygonsOnly = (polygons) ->
   planPolygons = polygons.filter (polygon) ->
@@ -767,4 +779,5 @@ zoneTypes = ->
       color_code = zone.color_code
 
       zones[id] = { code: code, description: description, classification: classification, color_code: color_code}
+
   zones
