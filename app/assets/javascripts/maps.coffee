@@ -130,7 +130,7 @@ $ ->
 
   adminEditPolygon = (polygon) ->
     polygon.fillOpacity = 0.6
-    google.maps.event.addListener(polygon, 'click', showZoneEdit)
+    google.maps.event.addListener(polygon, 'click', showZone)
     google.maps.event.addListener(polygon, 'mouseover', ->
       this.setEditable(true)
       )
@@ -181,9 +181,9 @@ $ ->
     switch
       when $("body.plans.edit").length then adminEditPolygon(polygon)
       when $("body.plans.show").length
-        google.maps.event.addListener(polygon, 'click', showZoneInfo)
+        google.maps.event.addListener(polygon, 'click', showZone)
       when $("body.user_polygons.show").length
-        google.maps.event.addListener(polygon, 'click', showZoneInfo)
+        google.maps.event.addListener(polygon, 'click', showZone)
       when $("body.plans.stats").length
         google.maps.event.addListener(polygon, 'click', showZoneStats)
 
@@ -310,7 +310,7 @@ $ ->
 
 
         addDeleteButton(overlay, 'http://i.imgur.com/RUrKV.png')
-        google.maps.event.addListener(overlay, 'click', showZoneEdit)
+        google.maps.event.addListener(overlay, 'click', showZone)
 
 
 
@@ -357,67 +357,67 @@ $ ->
   getDeleteButton = (imageUrl) ->
     $("img[src$='" + imageUrl + "']")
 
-  showZoneEdit = (event) ->
+  # showZoneEdit = (event) ->
 
-    planId = this.planId; name = this.name
+  #   planId = this.planId; name = this.name
 
-    if this.id?
-      id = this.id; description = this.description
-      content = "<div class='row'>What's this?</div><div class='row'>" + description + "</div>"
-      form_action = 'update'
-    else
-      description = ""; id = ""; content = ""
-      form_action = 'create'
+  #   if this.id?
+  #     id = this.id; description = this.description
+  #     content = "<div class='row'>What's this?</div><div class='row'>" + description + "</div>"
+  #     form_action = 'update'
+  #   else
+  #     description = ""; id = ""; content = ""
+  #     form_action = 'create'
 
-    paths_object = new Array()
-    for path in this.getPath().getArray()
-      paths_object.push { 'lat': path.lat(), 'lng': path.lng()}
-    paths = JSON.stringify(paths_object)
-
-
-    console.log this.getPath().getArray()
-
-    hiddenInput = "<input name='paths' type='hidden' value='#{paths}'>
-              <input name='planId' type='hidden' value='#{planId}'>
-              <input name='id' type='hidden' value='#{id}'>
-              <input type='hidden' name='zoneid' value=0>"
+  #   paths_object = new Array()
+  #   for path in this.getPath().getArray()
+  #     paths_object.push { 'lat': path.lat(), 'lng': path.lng()}
+  #   paths = JSON.stringify(paths_object)
 
 
-    userInput = "<div class='row'>Set new zone:</div>
-              <div class='row'><div id='infoBoxDrop'><h4>Drop new zone here</h4></div></div>
-              <form action='/polygons/#{form_action}' method='post'>
-              <div class='row'><div class='radio'>
-                <label class='small'><input type='radio' name='polygontype' id='radio_planmap' value='planmap'>Plan Layout</label>
-              </div>
-              <div class='radio'>
-                <label class='small'><input type='radio' name='polygontype' id='radio_zone' value='zone' checked>Zone</label>
-              </div></div>
+  #   console.log this.getPath().getArray()
 
-              <div class='row'>Set new description:</div>
-              <div class='row'><div class='form-group'>
-              <textarea value='#{description}' placeholder='Describe what should go here instead' name='description' rows='2' class='form-control'>
-              </textarea></div></div>" + hiddenInput +
-              "<div class='row' id='form_modify_polygon'><input type='submit' value='submit' class='btn btn-primary btn-sm'></form>
-              <form action='/polygons/delete' method='post'><input name='id' type='hidden' value='#{id}'>
-              <input type='submit' value='Delete' class='btn btn-primary btn-sm'>
-              </div></form>"
-    infoWindow.setContent(content + userInput)
-    infoWindow.setPosition(event.latLng)
-    infoWindow.open(map)
+  #   hiddenInput = "<input name='paths' type='hidden' value='#{paths}'>
+  #             <input name='planId' type='hidden' value='#{planId}'>
+  #             <input name='id' type='hidden' value='#{id}'>
+  #             <input type='hidden' name='zoneid' value=0>"
 
-    infoBoxDrop = document.getElementById("infoBoxDrop")
-    infoBoxDrop.addEventListener('dragover' , (e) ->
-      e.preventDefault()
-      false
-    )
-    infoBoxDrop.addEventListener('drop', (e) ->
-      newzone = e.dataTransfer.getData("text/plain")
-      $("input[name='zoneid']").val(newzone)
-      $("#infoBoxDrop").html("<div class='legendbox' style='background-color:" + zones[newzone].color_code + "'></div>
-        <h5>" + zones[newzone].classification + "</h5>")
-      e.preventDefault()
-      false
-    )
+
+  #   userInput = "<div class='row'>Set new zone:</div>
+  #             <div class='row'><div id='infoBoxDrop'><h4>Drop new zone here</h4></div></div>
+  #             <form action='/polygons/#{form_action}' method='post'>
+  #             <div class='row'><div class='radio'>
+  #               <label class='small'><input type='radio' name='polygontype' id='radio_planmap' value='planmap'>Plan Layout</label>
+  #             </div>
+  #             <div class='radio'>
+  #               <label class='small'><input type='radio' name='polygontype' id='radio_zone' value='zone' checked>Zone</label>
+  #             </div></div>
+
+  #             <div class='row'>Set new description:</div>
+  #             <div class='row'><div class='form-group'>
+  #             <textarea value='#{description}' placeholder='Describe what should go here instead' name='description' rows='2' class='form-control'>
+  #             </textarea></div></div>" + hiddenInput +
+  #             "<div class='row' id='form_modify_polygon'><input type='submit' value='submit' class='btn btn-primary btn-sm'></form>
+  #             <form action='/polygons/delete' method='post'><input name='id' type='hidden' value='#{id}'>
+  #             <input type='submit' value='Delete' class='btn btn-primary btn-sm'>
+  #             </div></form>"
+  #   infoWindow.setContent(content + userInput)
+  #   infoWindow.setPosition(event.latLng)
+  #   infoWindow.open(map)
+
+  #   infoBoxDrop = document.getElementById("infoBoxDrop")
+  #   infoBoxDrop.addEventListener('dragover' , (e) ->
+  #     e.preventDefault()
+  #     false
+  #   )
+  #   infoBoxDrop.addEventListener('drop', (e) ->
+  #     newzone = e.dataTransfer.getData("text/plain")
+  #     $("input[name='zoneid']").val(newzone)
+  #     $("#infoBoxDrop").html("<div class='legendbox' style='background-color:" + zones[newzone].color_code + "'></div>
+  #       <h5>" + zones[newzone].classification + "</h5>")
+  #     e.preventDefault()
+  #     false
+  #   )
 
 
 
@@ -502,7 +502,7 @@ $ ->
       infoWindow.open(map)
 
 
-  showZoneInfo = (event) ->
+  showZone = (event) ->
     console.log "this"
 
     id = this.id
@@ -510,36 +510,74 @@ $ ->
     planId = this.planId
     name = this.name
     description = this.description
-    paths = this.getPath().getArray()
+
+    paths_object = new Array()
+    for path in this.getPath().getArray()
+      paths_object.push { 'lat': path.lat(), 'lng': path.lng()}
+    paths = JSON.stringify(paths_object)
+
+
 
     $(".zone").css('background-color','')
     $(".zone a").css('color','')
     $(".zone.#{zoneid}").css('background-color','#880000')
     $(".zone.#{zoneid} a").css('color','#ffffff')
 
-    content = "<h5>Description:</h5><div class='row'>" + description + "</div>"
-    hiddenInput = "<input type='hidden' name='zoneid'><input type='hidden' value='#{this.id}' name='polygonid'>"
-    userInput = "<h5>Zone:</h5><div class='legendbox' style='background-color:" + zones[this.zoneid].color_code + "'></div><div class='row'>" + zones[this.zoneid].classification + "</div></div>
-      <h5>New Zone:</h5><div class='row'><div id='infoBoxDrop'><h4>Drop Custom Zone here</h4></div></div>
-      <h5>New Description:</h5>
-      <form action='/user_polygons' method='post'>
-      <div class='row'>
+
+    if this.id?
+      id = this.id; description = this.description; zoneid = this.zoneid
+      description_tag = "<div class='row'>" + description + "</div>"
+      edit_form_tag = "<form action='/polygons/update' method='post'>"
+
+    else
+      description = ""; id = ""; description_tag = ""; zoneid = 0
+      edit_form_tag = "<form action='/polygons/create' method='post'>"
+
+    header_tag = "<div class='row'>What's this?</div>"
+    form_zoneid_tag = "<input type='hidden' name='zoneid' value='#{zoneid}'>"
+    # same thing different name
+    form_id_tag = "<input type='hidden' value='#{id}' name='id'>"
+    form_polygonid_tag = "<input type='hidden' value='#{id}' name='polygonid'>"
+
+    form_paths_tag = "<input name='hidden' type='hidden' value='#{paths}'>"
+    form_planid_tag = "<input name='planId' type='hidden' value='#{planId}'>"
+    form_polygontype_tag = "<div class='row'><div class='radio'>
+                <label class='small'><input type='radio' name='polygontype' id='radio_planmap' value='planmap'>Plan Layout</label>
+              </div>
+              <div class='radio'>
+                <label class='small'><input type='radio' name='polygontype' id='radio_zone' value='zone' checked>Zone</label>
+              </div></div>"
+    form_zoneDropBox_tag = "<h5>Set Zone:</h5>
+      <div class='row'><div id='infoBoxDrop'><h4>Drop Custom Zone here</h4></div></div>"
+
+
+    userpolygon_form_tag = "<form action='/user_polygons' method='post'>"
+    form_description_tag = "<h5>Set Description:</h5><div class='row'>
         <div class='form-group'><textarea placeholder='Describe what should go here instead' name='description' rows='2' class='form-control'></textarea>
         </div>
-      </div>" + hiddenInput +
-      "<div class='row'><div class='form-group'>
+      </div>"
+    form_submit_tag = "<div class='row'><div class='form-group'>
       <input type='submit' class='btn btn-primary btn-sm' value='submit'></form>
       </div></div>"
 
 
+
+    content = header_tag + description_tag
+
+    if $("body.plans.edit").length
+      content = content + form_zoneDropBox_tag + edit_form_tag + form_description_tag + form_polygontype_tag + form_paths_tag + form_planid_tag + form_id_tag + form_zoneid_tag + form_submit_tag
     if $("body.user_polygons.show").length
-      content = content + userInput
+      content = content + form_zoneDropBox_tag + userpolygon_form_tag + form_description_tag + form_zoneid_tag + form_polygonid_tag + form_submit_tag
+    if $("body.plans.show").length
+      content = content
+
+
 
     infoWindow.setContent(content)
     infoWindow.setPosition(event.latLng)
     infoWindow.open(map)
 
-    if $("body.user_polygons.show").length
+    if $("body.user_polygons.show").length or $("body.plans.edit").length
       infoBoxDrop = document.getElementById("infoBoxDrop")
       infoBoxDrop.addEventListener('dragover' , (e) ->
         e.preventDefault()
@@ -554,6 +592,62 @@ $ ->
         e.preventDefault()
         false
       )
+
+
+
+  # showZoneInfo = (event) ->
+  #   console.log "this"
+
+  #   id = this.id
+  #   zoneid = this.zoneid
+  #   planId = this.planId
+  #   name = this.name
+  #   description = this.description
+  #   paths = this.getPath().getArray()
+
+  #   $(".zone").css('background-color','')
+  #   $(".zone a").css('color','')
+  #   $(".zone.#{zoneid}").css('background-color','#880000')
+  #   $(".zone.#{zoneid} a").css('color','#ffffff')
+
+  #   content = "<h5>Description:</h5><div class='row'>" + description + "</div>"
+  #   hiddenInput = "<input type='hidden' name='zoneid'>
+  #   <input type='hidden' value='#{this.id}' name='polygonid'>"
+  #   userInput = "<h5>Zone:</h5><div class='legendbox' style='background-color:" + zones[this.zoneid].color_code + "'></div><div class='row'>" + zones[this.zoneid].classification + "</div></div>
+  #     <h5>New Zone:</h5><div class='row'><div id='infoBoxDrop'><h4>Drop Custom Zone here</h4></div></div>
+  #     <h5>New Description:</h5>
+  #     <form action='/user_polygons' method='post'>
+  #     <div class='row'>
+  #       <div class='form-group'><textarea placeholder='Describe what should go here instead' name='description' rows='2' class='form-control'></textarea>
+  #       </div>
+  #     </div>" + hiddenInput +
+  #     "<div class='row'><div class='form-group'>
+  #     <input type='submit' class='btn btn-primary btn-sm' value='submit'></form>
+  #     </div></div>"
+
+
+  #   if $("body.user_polygons.show").length
+  #     content = content + userInput
+
+  #   infoWindow.setContent(content)
+  #   infoWindow.setPosition(event.latLng)
+  #   infoWindow.open(map)
+
+  #   if $("body.user_polygons.show").length
+  #     infoBoxDrop = document.getElementById("infoBoxDrop")
+  #     infoBoxDrop.addEventListener('dragover' , (e) ->
+  #       e.preventDefault()
+  #       false
+  #     )
+  #     infoBoxDrop.addEventListener('drop', (e) ->
+
+  #       newzone = e.dataTransfer.getData("text/plain")
+  #       $("input[name='zoneid']").val(newzone)
+  #       $("#infoBoxDrop").html("<div class='legendbox' style='background-color:" + zones[newzone].color_code + "'></div>
+  #         <h5>" + zones[newzone].classification + "</h5>")
+  #       e.preventDefault()
+  #       false
+  #     )
 
 
   # PlanOverlay.prototype = new google.maps.OverlayView()
