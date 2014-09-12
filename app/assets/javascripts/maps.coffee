@@ -13,6 +13,7 @@ window.img = ''
 rectangle = null
 control = null
 
+
 $ ->
 
   newOverlay = null
@@ -87,17 +88,26 @@ $ ->
     )
 
     response.done (data) ->
+      defaultLocation = new google.maps.LatLng(22.297256, 113.948430)
 
 
 
-      latlng = new google.maps.LatLng(22.297256, 113.948430)
+
+      # latlng = new google.maps.LatLng(22.297256, 113.948430)
+
       mapOptions =
-        center: latlng
+        center: defaultLocation
         zoom: 10
       map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions)
 
+      if navigator.geolocation
+        navigator.geolocation.getCurrentPosition (position) ->
+          currentLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude)
+          map.setCenter(currentLocation)
+      else
+        map.setCenter(defaultLocation)
+
       for plan in data
-        vertices = []
 
         for polygon in planPolygonsOnly(plan.polygons)
 
@@ -107,6 +117,7 @@ $ ->
           polygon.fillOpacity = 0.8
           polygon.fillColor = '#888888'
           polygon.planName = plan.name
+
           marker = new google.maps.Marker
             position: planmap_bounds(plan.polygons).getCenter()
             map: map
@@ -114,7 +125,6 @@ $ ->
             planName: plan.name
 
           marker.setMap(map)
-          google.maps.event.addListener(polygon, 'click', showPlanInfo)
           google.maps.event.addListener(marker, 'click', showPlanInfo)
 
 
@@ -148,8 +158,7 @@ $ ->
 
   drawPolygon = (polygon, planId, customPolygons) ->
 
-    console.log polygon.id
-    console.log customPolygons
+
     vertices = []
 
     polygontype = polygon.polygontype
@@ -192,7 +201,8 @@ $ ->
         google.maps.event.addListener(polygon, 'click', showZone)
       when $("body.plans.stats").length
         google.maps.event.addListener(polygon, 'click', showZoneStats)
-
+      when $("body.home").length
+        google.maps.event.addListener(polygon, 'click', showPlanInfo)
     polygon
 
 
