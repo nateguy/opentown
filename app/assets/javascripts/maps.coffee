@@ -104,8 +104,6 @@ $ ->
         navigator.geolocation.getCurrentPosition (position) ->
           currentLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude)
           map.setCenter(currentLocation)
-      else
-        map.setCenter(defaultLocation)
 
       for plan in data
 
@@ -147,6 +145,7 @@ $ ->
     google.maps.event.addListener(polygon, 'click', showZone)
     google.maps.event.addListener(polygon, 'mouseover', ->
       this.setEditable(true)
+
       )
     google.maps.event.addListener(polygon, 'mouseout', ->
       this.setEditable(false)
@@ -163,7 +162,6 @@ $ ->
 
     polygontype = polygon.polygontype
     if customPolygons? and customPolygons[polygon.id]?
-      console.log customPolygons[polygon.id]
       zoneid = customPolygons[polygon.id].zoneid
       description = customPolygons[polygon.id].description
     else
@@ -175,18 +173,19 @@ $ ->
 
 
     polygon = new google.maps.Polygon
-      editable: false,
-      paths: vertices,
-      strokeWeight: 0.5,
-      zoneid: zoneid,
-      fillColor: zones[zoneid].color_code,
-      fillOpacity: 1,
-      id: polygon.id,
-      description: polygon.description
+      editable: false
+      paths: vertices
+      strokeWeight: 0.5
+      zoneid: zoneid
+      fillColor: zones[zoneid].color_code
+      fillOpacity: 1
+      id: polygon.id
+      description: description
       planId: planId
       name: polygon.name
 
     polygon.setMap(map)
+
     # if polygon.polygontype = "planmap"
     #   console.log "setting map"
     #   map.fitBounds(polygon.getBounds())
@@ -256,7 +255,6 @@ $ ->
       map.fitBounds(imageBounds)
       drawingManager = drawingTools(planId)
       drawingManager.setMap map
-
 
 
       control = drawControl(map, imageBounds)
@@ -373,67 +371,6 @@ $ ->
   getDeleteButton = (imageUrl) ->
     $("img[src$='" + imageUrl + "']")
 
-  # showZoneEdit = (event) ->
-
-  #   planId = this.planId; name = this.name
-
-  #   if this.id?
-  #     id = this.id; description = this.description
-  #     content = "<div class='row'>What's this?</div><div class='row'>" + description + "</div>"
-  #     form_action = 'update'
-  #   else
-  #     description = ""; id = ""; content = ""
-  #     form_action = 'create'
-
-  #   paths_object = new Array()
-  #   for path in this.getPath().getArray()
-  #     paths_object.push { 'lat': path.lat(), 'lng': path.lng()}
-  #   paths = JSON.stringify(paths_object)
-
-
-  #   console.log this.getPath().getArray()
-
-  #   hiddenInput = "<input name='paths' type='hidden' value='#{paths}'>
-  #             <input name='planId' type='hidden' value='#{planId}'>
-  #             <input name='id' type='hidden' value='#{id}'>
-  #             <input type='hidden' name='zoneid' value=0>"
-
-
-  #   userInput = "<div class='row'>Set new zone:</div>
-  #             <div class='row'><div id='infoBoxDrop'><h4>Drop new zone here</h4></div></div>
-  #             <form action='/polygons/#{form_action}' method='post'>
-  #             <div class='row'><div class='radio'>
-  #               <label class='small'><input type='radio' name='polygontype' id='radio_planmap' value='planmap'>Plan Layout</label>
-  #             </div>
-  #             <div class='radio'>
-  #               <label class='small'><input type='radio' name='polygontype' id='radio_zone' value='zone' checked>Zone</label>
-  #             </div></div>
-
-  #             <div class='row'>Set new description:</div>
-  #             <div class='row'><div class='form-group'>
-  #             <textarea value='#{description}' placeholder='Describe what should go here instead' name='description' rows='2' class='form-control'>
-  #             </textarea></div></div>" + hiddenInput +
-  #             "<div class='row' id='form_modify_polygon'><input type='submit' value='submit' class='btn btn-primary btn-sm'></form>
-  #             <form action='/polygons/delete' method='post'><input name='id' type='hidden' value='#{id}'>
-  #             <input type='submit' value='Delete' class='btn btn-primary btn-sm'>
-  #             </div></form>"
-  #   infoWindow.setContent(content + userInput)
-  #   infoWindow.setPosition(event.latLng)
-  #   infoWindow.open(map)
-
-  #   infoBoxDrop = document.getElementById("infoBoxDrop")
-  #   infoBoxDrop.addEventListener('dragover' , (e) ->
-  #     e.preventDefault()
-  #     false
-  #   )
-  #   infoBoxDrop.addEventListener('drop', (e) ->
-  #     newzone = e.dataTransfer.getData("text/plain")
-  #     $("input[name='zoneid']").val(newzone)
-  #     $("#infoBoxDrop").html("<div class='legendbox' style='background-color:" + zones[newzone].color_code + "'></div>
-  #       <h5>" + zones[newzone].classification + "</h5>")
-  #     e.preventDefault()
-  #     false
-  #   )
 
 
 
@@ -472,7 +409,7 @@ $ ->
 
 
   showZoneStats = (event) ->
-    zones
+
     zones_users = {}
     id = this.id
     zoneid = this.zoneid
@@ -491,16 +428,14 @@ $ ->
 
       for zone of zones
         zone = parseInt(zone)
-        zonePolygons = data.filter((polygon) ->
+        zonePolygons = data.filter (polygon) ->
           polygon.custom_zone == zone && polygon.polygon_id == id
-          )
-        if zonePolygons.length > 0
 
+        if zonePolygons.length > 0
           zone_users.push {zone_id: zone, size: zonePolygons.length }
 
-      zone_users = zone_users.sort((obj1, obj2) ->
-        obj2.size - obj1.size
-        )
+      zone_users = zone_users.sort (zoneuser1, zoneuser2) ->
+        zoneuser2.size - zoneuser1.size
 
 
       content = "<table class='table table-striped'><tr><th>Zone Code</th><th>Users</th></tr>"
@@ -520,7 +455,7 @@ $ ->
 
 
   showZone = (event) ->
-    console.log zones
+    console.log event
 
     planMapZoneId = ->
       for id in Object.keys(zones)
@@ -579,8 +514,6 @@ $ ->
                 </div></form>"
 
 
-
-
     content = header_tag + description_tag
 
     if $("body.plans.edit").length
@@ -613,63 +546,6 @@ $ ->
       )
 
 
-
-  # showZoneInfo = (event) ->
-  #   console.log "this"
-
-  #   id = this.id
-  #   zoneid = this.zoneid
-  #   planId = this.planId
-  #   name = this.name
-  #   description = this.description
-  #   paths = this.getPath().getArray()
-
-  #   $(".zone").css('background-color','')
-  #   $(".zone a").css('color','')
-  #   $(".zone.#{zoneid}").css('background-color','#880000')
-  #   $(".zone.#{zoneid} a").css('color','#ffffff')
-
-  #   content = "<h5>Description:</h5><div class='row'>" + description + "</div>"
-  #   hiddenInput = "<input type='hidden' name='zoneid'>
-  #   <input type='hidden' value='#{this.id}' name='polygonid'>"
-  #   userInput = "<h5>Zone:</h5><div class='legendbox' style='background-color:" + zones[this.zoneid].color_code + "'></div><div class='row'>" + zones[this.zoneid].classification + "</div></div>
-  #     <h5>New Zone:</h5><div class='row'><div id='infoBoxDrop'><h4>Drop Custom Zone here</h4></div></div>
-  #     <h5>New Description:</h5>
-  #     <form action='/user_polygons' method='post'>
-  #     <div class='row'>
-  #       <div class='form-group'><textarea placeholder='Describe what should go here instead' name='description' rows='2' class='form-control'></textarea>
-  #       </div>
-  #     </div>" + hiddenInput +
-  #     "<div class='row'><div class='form-group'>
-  #     <input type='submit' class='btn btn-primary btn-sm' value='submit'></form>
-  #     </div></div>"
-
-
-  #   if $("body.user_polygons.show").length
-  #     content = content + userInput
-
-  #   infoWindow.setContent(content)
-  #   infoWindow.setPosition(event.latLng)
-  #   infoWindow.open(map)
-
-  #   if $("body.user_polygons.show").length
-  #     infoBoxDrop = document.getElementById("infoBoxDrop")
-  #     infoBoxDrop.addEventListener('dragover' , (e) ->
-  #       e.preventDefault()
-  #       false
-  #     )
-  #     infoBoxDrop.addEventListener('drop', (e) ->
-
-  #       newzone = e.dataTransfer.getData("text/plain")
-  #       $("input[name='zoneid']").val(newzone)
-  #       $("#infoBoxDrop").html("<div class='legendbox' style='background-color:" + zones[newzone].color_code + "'></div>
-  #         <h5>" + zones[newzone].classification + "</h5>")
-  #       e.preventDefault()
-  #       false
-  #     )
-
-
-  # PlanOverlay.prototype = new google.maps.OverlayView()
   google.maps.event.addDomListener(window, 'load', initializeMap)
 
   $('#plantabs .btn').click ->

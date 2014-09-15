@@ -7,6 +7,7 @@
   <div class="span12 case-menu">
     <div id="plantabs" class="btn-group" data-toggle="btns">
       <a class="btn btn-default" href="#background" data-toggle="tab">Background Info</a>
+      <a class="btn btn-default" href="#status" data-toggle="tab">Plan Status</a>
       <a class="btn btn-default active" href="#odp" data-toggle="tab">Plan Layout</a>
 
 
@@ -16,6 +17,9 @@
   <div class="tab-content">
     <div class="tab-pane" id="background">
         <%= render 'planform' %>
+    </div>
+    <div class="tab-pane" id="status">
+        <%= render template: 'plan_statuses/show', locals: { plan: @plan } %>
     </div>
     <div class="tab-pane active" id="odp">
         <%= render 'planmapeditor' %>

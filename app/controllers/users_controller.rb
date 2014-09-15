@@ -8,7 +8,7 @@ class UsersController < ApplicationController
   end
 
   def update
-    puts "right here"
+
     @user.update(admin_params)
     redirect_to :back
   end

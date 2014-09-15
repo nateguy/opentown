@@ -10,14 +10,14 @@ Rails.application.routes.draw do
   get 'plans/all' => 'plans#showall'
   get 'plans/stats/' => 'plans#stats'
   post 'plans/update_bounds' => 'plans#update_bounds'
-
+  post 'plan_statuses/activate' => 'plan_statuses#activate'
 
   post 'polygons/update' => 'polygons#update'
   post 'polygons/create' => 'polygons#create'
   post 'polygons/delete' => 'polygons#delete'
   resources :user_polygons
   #resources :polygons, only: [:create, :destroy, :update]
-
+  resources :plan_statuses
   resources :zones
   resources :plans
   resources :comments

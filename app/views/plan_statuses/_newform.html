@@ -1,0 +1,56 @@
+
+<div class="planstatusform">
+  <%= form_for(@plan_status) do |f| %>
+
+
+  <%= f.hidden_field :plan_id, value: @plan_id%>
+
+
+
+  <div class="row">
+    <div class="form-group">
+
+        <%= f.label :status, class: "col-md-2 control-label"  %>
+
+
+
+
+      <div class="col-md-10">
+        <%= f.collection_select :status_id, Status.all, :id, :description, class: "form-control status_select" %>
+      </div>
+    </div>
+  </div>
+
+
+
+  <div class="row">
+    <div class="form-group">
+
+        <%= f.label :effect_date, class: "col-md-2 control-label"  %>
+
+      <div class="col-md-10">
+        <%= f.date_field :effect_date, class: "form-control", value: Date.today %>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="form-group">
+
+        <%= f.label :stage, class: "col-md-2 control-label"  %>
+
+      <div class="col-md-10">
+        <%= f.text_field :stage, class: "form-control" %>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="actions">
+      <div class="col-md-6">
+        <%= f.submit "Submit", class: "btn btn-default btn-primary" %>
+      </div>
+    </div>
+  </div>
+  <% end %>
+
+</div>
+

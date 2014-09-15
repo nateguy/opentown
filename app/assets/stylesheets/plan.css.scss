@@ -2,9 +2,87 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
+.planstatusform {
+  background-color: #cccccc;
+  margin-top: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border-radius: 10px;
+}
+
+.plan-status-steps {
+  padding: 5px;
+  list-style: none;
+  background-color: #880000;
+  display: inline-block;
+  border-radius: 6px;
+  padding-right: 20px;
+}
 
 
+.plan-header {
+  vertical-align: top;
+  display: inline-block;
+  position: relative;
 
+  padding: 2px 2px 2px 2px;
+  color: #ffffff;
+  font-size: 16pt;
+
+}
+
+.plan-step.active {
+  background-color: #FFFF00;
+
+}
+
+.plan-step.active:after {
+  border-color: transparent #FFFF00;
+}
+
+.plan-step {
+  display: inline-table;
+  position: relative;
+  height: 50px;
+  padding: 2px 7px 2px 7px;
+
+  background-color: #eeeeee;
+  border-radius: 6px;
+  border: #880000 solid 3px;
+  margin-right: 2px;
+  a {
+    color: #880000;
+    font-size: 10pt;
+  }
+
+}
+
+.plan-step:after {
+  content: '';
+  position: absolute;
+  border-style: solid;
+  border-width: 20px 0 20px 7px;
+  border-color: transparent #eeeeee;
+  display: block;
+  width: 0;
+  z-index: 1;
+  right: -7px;
+  top: 2px;
+
+}
+
+.plan-step:before {
+  content: '';
+  position: absolute;
+/*  border-style: solid;*/
+  border-width: 22px 0 22px 10px;
+  border-color: transparent #ffffff;
+  display: block;
+  width: 0;
+  z-index: 0;
+  right: -12px;
+  top: 0px;
+}
 
 .plans #map-canvas, .user_polygons #map-canvas {
   height: 500px;

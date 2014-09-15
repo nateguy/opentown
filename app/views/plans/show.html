@@ -15,6 +15,32 @@
 
     </div>
   </div>
+
+  <div class="plan-status">
+    <ul class="plan-status-steps">
+      <li class="plan-header">
+        Status
+      </li>
+
+      <% @plan.plan_statuses.each_with_index do |plan_status, index| %>
+
+        <% if index == @plan.plan_statuses.size - 1 %>
+          <li class="plan-step active">
+        <% else %>
+          <li class="plan-step">
+        <% end %>
+          <a>
+          <span>
+          <%= plan_status.status.description %></span>
+          <% if plan_status.stage %>
+            <br><span>Stage <%= plan_status.stage %></span>
+          <% end %>
+          </a>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+
   <div class="span12 case-menu">
     <div id="plantabs" class="btn-group" data-toggle="btns">
       <a class="btn btn-default active" href="#odp" data-toggle="tab">Outline Development Plan</a>

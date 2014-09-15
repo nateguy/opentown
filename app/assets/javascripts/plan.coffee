@@ -1,4 +1,6 @@
 $ ->
+
+
   $('a[class=editcontentbtn]').click ->
     id = this.dataset.commentId
     content_div = "#content#{id}"
@@ -17,3 +19,15 @@ $ ->
       e.dataTransfer.setData("text", zoneid)
       false
     )
+
+  $("#plan_status_status_id").change ->
+    plan_status_change()
+
+  plan_status_change = ->
+    status_id = $("#plan_status_status_id").val()
+    set_stage_number = $(".plan_status[data-id='#{status_id}']").length + 1
+    $("#plan_status_stage").val(set_stage_number)
+
+  plan_status_change()
+
+

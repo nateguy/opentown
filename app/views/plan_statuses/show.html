@@ -1,0 +1,44 @@
+<div>
+<table class="table table-stripped">
+  <thead>
+    <tr>
+
+      <th class="col-md-3">Status</th>
+      <th class="col-md-3">Stage</th>
+      <th class="col-md-3">Date</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @plan.plan_statuses.each do |plan_status| %>
+
+    <tr class="plan_status" data-id=<%= plan_status.status.id %>>
+
+      <td class="col-md-3"><%= plan_status.status.description %></td>
+      <td class="col-md-3"><%= plan_status.stage %></td>
+      <td class="col-md-3"><%= plan_status.effect_date %></td>
+      <td class="col-md-1">
+
+        <%= form_for plan_status do |f| %>
+          <%= f.hidden_field :active, value: true %>
+          <%= f.submit "Activate", class: "btn btn-default" %>
+        <% end %>
+
+
+
+      </td>
+      <td class="col-md-1"><%= link_to 'Edit', edit_plan_status_path(plan_status), :remote => true, :class => 'btn btn-primary' %></td>
+      <td class="col-md-1"><%= link_to 'Delete', plan, method: :delete, data: { confirm: 'Are you sure?' }, :class => 'btn btn-primary' %></td>
+    </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<%= link_to 'New Status', new_plan_status_path(:plan_id => @plan.id), :remote => true, :class => 'btn btn-primary' %>
+
+
+
+<div id="plan_status_edit_form"></div>
+
+
+</div>

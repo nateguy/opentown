@@ -1,0 +1,2 @@
+module PlanStatusesHelper
+end
