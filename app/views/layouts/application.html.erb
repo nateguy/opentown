@@ -52,6 +52,8 @@
                   <li class="divider"></li>
                   <li><%= link_to 'New Zone', new_zone_path %></li>
                   <li><%= link_to 'Edit Zones', zones_path %></li>
+                  <li class="divider"></li>
+                  <li><%= link_to 'Plan Statuses', statuses_path %></li>
                   <% if current_user.super_admin %>
                     <li class="divider"></li>
                     <li><%= link_to 'User Permissions', users_path %></li>

@@ -7,8 +7,8 @@ class PlanStatusesController < ApplicationController
     @plan_statuses = PlanStatus.all
     @plan_statuses.each do |plan_status|
       plan_status.active = false
+      plan_status.save
     end
-    @plan_statuses.save
 
     if @plan_status.update(active: params[:active])
       redirect_to :back, notice: 'Status updated.'
@@ -44,7 +44,29 @@ class PlanStatusesController < ApplicationController
 
   def update
 
+
+
+
     if @plan_status.update(plan_status_params)
+
+      if @plan_status.active
+        #set all to current as true, set rest as false
+
+        @all_plan_status_items = Plan.find(@plan_status.plan_id).plan_statuses
+
+        @all_plan_status_items.each do |item|
+
+          if (item.id <= @plan_status.id)
+            item.update(active: true)
+          else
+            item.update(active: false)
+          end
+
+        end
+      end
+
+
+
       redirect_to :back, notice: 'Status updated.'
     else
       redirect_to :back, notice: 'Status update failed.'

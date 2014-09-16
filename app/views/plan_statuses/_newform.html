@@ -16,7 +16,7 @@
 
 
       <div class="col-md-10">
-        <%= f.collection_select :status_id, Status.all, :id, :description, class: "form-control status_select" %>
+        <%= f.collection_select :status_id, Status.all, :id, :description, {}, {class: "form-control status_select"} %>
       </div>
     </div>
   </div>

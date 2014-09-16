@@ -21,10 +21,12 @@
       <li class="plan-header">
         Status
       </li>
+        <li class="plan-step active">
+          <span>Opened</span>
+        </li>
+      <% @plan.plan_statuses.each do |plan_status| %>
 
-      <% @plan.plan_statuses.each_with_index do |plan_status, index| %>
-
-        <% if index == @plan.plan_statuses.size - 1 %>
+        <% if plan_status.active %>
           <li class="plan-step active">
         <% else %>
           <li class="plan-step">

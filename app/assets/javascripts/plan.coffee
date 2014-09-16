@@ -21,13 +21,15 @@ $ ->
     )
 
   $("#plan_status_status_id").change ->
+    alert "hey"
     plan_status_change()
 
   plan_status_change = ->
     status_id = $("#plan_status_status_id").val()
+    alert status_id
     set_stage_number = $(".plan_status[data-id='#{status_id}']").length + 1
     $("#plan_status_stage").val(set_stage_number)
 
-  plan_status_change()
+
 
 

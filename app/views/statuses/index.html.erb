@@ -1,0 +1,33 @@
+<div id="table-page">
+<h1>Status Edit Panel</h1>
+
+<table class="table table-stripped">
+  <thead>
+    <tr>
+
+      <th class="col-md-10">Description</th>
+
+
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @statuses.each do |status| %>
+    <tr>
+
+      <td class="col-md-10"><%= status.description %></td>
+
+      <td class="col-md-1"><%= link_to 'Edit', edit_status_path(status), :remote => true, :class => 'btn btn-primary' %></td>
+      <td class="col-md-1"><%= link_to 'Delete', status, method: :delete, data: { confirm: 'Are you sure?' }, :class => 'btn btn-primary' %></td>
+    </tr>
+    <% end %>
+  </tbody>
+</table>
+<%= link_to 'New Status', new_status_path, :remote => true, :class => 'btn btn-primary' %>
+  <div id="plan_status_edit_form">
+
+  </div>
+
+
+</div>
+

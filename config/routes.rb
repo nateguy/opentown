@@ -19,6 +19,7 @@ Rails.application.routes.draw do
   #resources :polygons, only: [:create, :destroy, :update]
   resources :plan_statuses
   resources :zones
+  resources :statuses
   resources :plans
   resources :comments
   resources :ratings, only: [:create, :destroy]

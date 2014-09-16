@@ -20,8 +20,13 @@
       <td class="col-md-1">
 
         <%= form_for plan_status do |f| %>
+          <%= f.hidden_field :plan_id, value: @plan.id %>
           <%= f.hidden_field :active, value: true %>
-          <%= f.submit "Activate", class: "btn btn-default" %>
+          <% if plan_status.active %>
+            <%= f.submit "Activated", class: "btn btn-primary" %>
+          <% else %>
+            <%= f.submit "Activate", class: "btn btn-default" %>
+          <% end %>
         <% end %>
 
 
