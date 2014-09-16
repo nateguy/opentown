@@ -7,7 +7,7 @@
       <h1 id="plan-name"><%= @plan.name %></h1>
 
       <% if user_signed_in? %>
-        <div class="userplan1"><a class="btn-glow" data-toggle='modal' data-target="#newComment">Add Comment</a></div>
+        <div class="userplan1"><a class="btn-glow" data-toggle='modal' data-target="#newComment">Comment</a></div>
         <div class="userplan1"><a class="btn-glow" data-toggle='modal' data-target="#newRating">Rate Plan</a></div>
         <div class="userplan1"><%= link_to "Customize Plan", user_polygon_path(id: @plan.id), :class => 'btn-glow' %></div>
 
@@ -18,9 +18,9 @@
 
   <div class="plan-status">
     <ul class="plan-status-steps">
-      <li class="plan-header">
+<!--       <li class="plan-header">
         Status
-      </li>
+      </li> -->
         <li class="plan-step active">
           <a><span>Opened</span></a>
         </li>
