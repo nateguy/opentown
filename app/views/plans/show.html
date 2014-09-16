@@ -22,7 +22,7 @@
         Status
       </li>
         <li class="plan-step active">
-          <span>Opened</span>
+          <a><span>Opened</span></a>
         </li>
       <% @plan.plan_statuses.each do |plan_status| %>
 
@@ -47,6 +47,7 @@
     <div id="plantabs" class="btn-group" data-toggle="btns">
       <a class="btn btn-default active" href="#odp" data-toggle="tab">Outline Development Plan</a>
       <a class="btn btn-default" href="#background" data-toggle="tab">Background</a>
+      <a class="btn btn-default" href="#status" data-toggle="tab">History</a>
       <a class="btn btn-default" href="#comments" data-toggle="tab">Comments</a>
       <a class="btn btn-default" href="#rating" data-toggle="tab">Rating</a>
     </div>
@@ -58,6 +59,9 @@
     </div>
     <div class="tab-pane" id="background">
         <%= render partial: 'plans/background', locals: { plan: @plan } %>
+    </div>
+    <div class="tab-pane" id="status">
+        <%= render template: 'plan_statuses/status', locals: { plan: @plan } %>
     </div>
     <div class="tab-pane <%= 'active' if params[:tab] == 'comments' %>" id="comments">
         <%= render template: 'comments/show', locals: { plan: @plan } %>

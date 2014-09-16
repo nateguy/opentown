@@ -1,0 +1,27 @@
+<div id="status_template">
+<% @plan.plan_statuses.each do |plan_status| %>
+
+
+  <div class="row">
+    <div class="col-md-3">
+
+          <h4><%= plan_status.effect_date.strftime('%d %b %Y') %></h4>
+
+    </div>
+    <div class="col-md-9">
+      <% if plan_status.active %>
+        <div class="panel active panel-default">
+      <% else %>
+        <div class="panel panel-default">
+      <% end %>
+        <div class="panel-body">
+          <h5><%= plan_status.status.description %></h5>
+          Stage <%= plan_status.stage %>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+<% end %>
+</div>

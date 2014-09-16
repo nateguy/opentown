@@ -35,11 +35,9 @@ class PlanStatusesController < ApplicationController
   end
 
   def destroy
-    if @plan_status.destroy
-      redirect_to :back, notice: 'Status updated.'
-    else
-      redirect_to :back, notice: 'Status update failed.'
-    end
+    @plan_status.destroy
+    redirect_to :back, notice: 'Status deleted.'
+
   end
 
   def update
@@ -74,11 +72,6 @@ class PlanStatusesController < ApplicationController
 
   end
 
-  def destroy
-
-  end
-
-
   def new
 
     @plan_id = params[:plan_id]
@@ -100,7 +93,6 @@ class PlanStatusesController < ApplicationController
     def set_plan_status
       @plan_status = PlanStatus.find(params[:id])
     end
-
 
     def plan_status_params
       params.require(:plan_status).permit(:stage, :active, :plan_id, :status_id, :effect_date)
