@@ -48,8 +48,7 @@
       <a class="btn btn-default active" href="#odp" data-toggle="tab">Outline Development Plan</a>
       <a class="btn btn-default" href="#background" data-toggle="tab">Background</a>
       <a class="btn btn-default" href="#status" data-toggle="tab">History</a>
-      <a class="btn btn-default" href="#comments" data-toggle="tab">Comments</a>
-      <a class="btn btn-default" href="#rating" data-toggle="tab">Rating</a>
+      <a class="btn btn-default" href="#comments" data-toggle="tab">User Feedback</a>
     </div>
   </div>
 
@@ -66,9 +65,7 @@
     <div class="tab-pane <%= 'active' if params[:tab] == 'comments' %>" id="comments">
         <%= render template: 'comments/show', locals: { plan: @plan } %>
     </div>
-    <div class="tab-pane" id="rating">
-        <%= render partial: 'plans/showrating', locals: { plan: @plan } %>
-    </div>
+
   </div>
 </div>
 

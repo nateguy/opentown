@@ -1,9 +1,28 @@
-<div class="row">
+
+<div class="row rating">
+  <div class="col-md-6" id="messagelist">
+  <ol class="message-item">
+    <li class="message-item-header"><div id="message" class="row"><h5>Rating</h5></div></li>
+    <li class="message-item"><div id="message" class="row">
+        <h3><%= @plan.ratings.average(:rating) %></h3>
+
+        <span>Out of <%= @plan.ratings.count %> Votes</span>
+
+
+
+    </div></li>
+    </ol>
+  </div>
+</div>
+
+
+<div class="row messages">
 
     <div class="col-md-6" id="messagelist">
 
         <ol class="message-item">
-
+          <li class="message-item-header"><div id="message" class="row"><h5>Comments</h5></div>
+          </li>
         <% @plan.comments.reverse.each do |comment| %>
 
 
