@@ -36,8 +36,13 @@ class UserPolygonsController < ApplicationController
   def show
 
     if user_signed_in?
-      plan_id = params[:id]
-      @plan = Plan.find(plan_id)
+
+      @plan = Plan.find(params[:id])
+      @plan.polygons.each do |polygon|
+        unless UserPolygon.exists?(user_id: User.current.id, polygon_id: polygon.id)
+          UserPolygon.create(user_id: User.current.id, polygon_id: polygon.id, custom_zone: polygon.zone_id, custom_description: polygon.description)
+        end
+      end
       @zones = Zone.all
 
 

@@ -154,16 +154,43 @@ $ ->
     addDeleteButton(polygon, 'http://i.imgur.com/RUrKV.png')
 
 
+  drawPlan = (polygon, planId) ->
+    vertices = []
+    for vertex in polygon.vertices
+      vertices.push new google.maps.LatLng(vertex.lat, vertex.lng)
 
-  drawPolygon = (polygon, planId, customPolygons) ->
+    polygontype = polygon.polygontype
+    description = polygon.description
+    fillColor = zones[planMapZoneId()].color_code
+    polygon = new google.maps.Polygon
+      editable: false
+      paths: vertices
+      strokeWeight: 0.5
+      fillColor: fillColor
+      fillOpacity: 0.6
+      id: polygon.id
+      description: description
+      planId: planId
+      planName: polygon.name
+
+
+    polygon.setMap(map)
+
+    infoWindow = new google.maps.InfoWindow()
+
+    if $("body.plans.edit").length
+      adminEditPolygon(polygon)
+    polygon
+
+  drawPolygon = (polygon, planId, customPolygon) ->
 
 
     vertices = []
 
     polygontype = polygon.polygontype
-    if customPolygons? and customPolygons[polygon.id]?
-      zoneid = customPolygons[polygon.id].zoneid
-      description = customPolygons[polygon.id].description
+    if customPolygon?
+      zoneid = customPolygon.zoneid
+      description = customPolygon.description
     else
       zoneid = polygon.zone_id
       description = polygon.description
@@ -183,12 +210,10 @@ $ ->
       description: description
       planId: planId
       name: polygon.name
+      polygontype: polygontype
 
     polygon.setMap(map)
 
-    # if polygon.polygontype = "planmap"
-    #   console.log "setting map"
-    #   map.fitBounds(polygon.getBounds())
 
     infoWindow = new google.maps.InfoWindow()
 
@@ -392,17 +417,12 @@ $ ->
       map.fitBounds(bounds)
 
       for polygon in planPolygonsOnly(data.polygons)
-
-        if customPolygons? and customPolygons[polygon.id]?
-          drawPolygon(polygon, planId, customPolygons)
-        else
-          drawPolygon(polygon, planId)
+        drawPlan(polygon, planId)
 
 
       for polygon in zonePolygonsOnly(data.polygons)
-
-        if customPolygons? and customPolygons[polygon.id]?
-          drawPolygon(polygon, planId, customPolygons)
+        if customPolygons? && customPolygons[polygon.id]?
+          drawPolygon(polygon, planId, customPolygons[polygon.id])
         else
           drawPolygon(polygon, planId)
 
@@ -452,15 +472,21 @@ $ ->
       infoWindow.setPosition(event.latLng)
       infoWindow.open(map)
 
+  $("input #planmap").click ->
+    alert "hey"
+    $("#infoBoxDrop").css('display', 'none')
 
+  planMapZoneId = ->
+    for id in Object.keys(zones)
+      if zones[id]['code'] == "planmap"
+        return id
 
   showZone = (event) ->
     console.log event
 
-    planMapZoneId = ->
-      for id in Object.keys(zones)
-        if zones[id]['code'] == "planmap"
-          return id
+
+
+
 
     id = this.id
     zoneid = this.zoneid
@@ -479,6 +505,10 @@ $ ->
     $(".zone.#{zoneid}").css('background-color','#880000')
     $(".zone.#{zoneid} a").css('color','#ffffff')
 
+    # if this.zoneid = planMapZoneId()
+    #   polygontype = "planmap"
+    # else
+    #   polygontype = "zone"
 
     if this.id?
       id = this.id; description = this.description; zoneid = this.zoneid
@@ -494,6 +524,18 @@ $ ->
     # same thing different name
     form_id_tag = "<input type='hidden' value='#{id}' name='id'>"
     form_polygonid_tag = "<input type='hidden' value='#{id}' name='polygonid'>"
+    form_polygontype_tag = "<div class='row'>
+      <div class='form-group'>
+
+          <input type='radio' name='polygontype' id='planmap' value='planmap'>
+          <span>Plan Outline</span>
+
+          <input type='radio' name='polygontype' id='zone' value='zone' checked>
+          <span>Zone</span>
+      </div></div>"
+
+
+
 
     form_paths_tag = "<input name='paths' type='hidden' value='#{paths}'>"
     form_planid_tag = "<input name='planId' type='hidden' value='#{planId}'>"
@@ -517,7 +559,7 @@ $ ->
     content = header_tag + description_tag
 
     if $("body.plans.edit").length
-      content = content + form_zoneDropBox_tag + edit_form_tag + form_description_tag + form_paths_tag + form_planid_tag + form_id_tag + form_zoneid_tag + form_submit_tag + form_delete_tag
+      content = content + form_zoneDropBox_tag + edit_form_tag + form_description_tag + form_polygontype_tag + form_paths_tag + form_planid_tag + form_id_tag + form_zoneid_tag + form_submit_tag + form_delete_tag
     if $("body.user_polygons.show").length
       content = content + form_zoneDropBox_tag + userpolygon_form_tag + form_description_tag + form_zoneid_tag + form_polygonid_tag + form_submit_tag + "</div>"
     if $("body.plans.show").length
