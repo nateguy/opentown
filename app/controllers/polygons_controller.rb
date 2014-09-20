@@ -14,10 +14,20 @@ class PolygonsController < ApplicationController
 
 
   def create
-    polygon = Polygon.new(plan_id: params[:planId], polygontype: params[:polygontype], zone_id: params[:zoneid], description: params[:description])
+    polygon = Polygon.new(plan_id: params[:planId], description: params[:description])
+    planMapPolygons = Polygon.where(polygontype: "planmap", plan_id: params[:planId])
 
-    polygon.polygontype = "planmap" if (Polygon.where(polygontype: "planmap", plan_id: params[:planId]).count < 1)
-    polygon.zone_id = return_planmap_id if polygon.polygontype.eql? "planmap"
+
+    if (params[:zoneid].to_i == return_planmap_id) || (planMapPolygons.count < 1)
+      puts "planmmapping"
+      polygon.polygontype = "planmap"
+      polygon.zone_id = return_planmap_id
+    else
+      puts "zonninging"
+      polygon.polygontype = "zone"
+      polygon.zone_id = params[:zoneid]
+    end
+
     polygon.save
     paths = JSON(params[:paths])
     generate_vertices(polygon, paths)
@@ -30,19 +40,15 @@ class PolygonsController < ApplicationController
 
     planMapPolygons = Polygon.where(polygontype: "planmap", plan_id: params[:planId])
 
-
-    if (planMapPolygons.count < 1) || ((planMapPolygons.count == 1)&&(polygon.polygontype == "planmap"))
+    if (params[:zoneid].to_i == return_planmap_id) || (planMapPolygons.count < 1) || ((planMapPolygons.count == 1)&&(polygon.polygontype == "planmap"))
       polygontype = "planmap"
-
-    else
-      polygontype = params[:polygontype]
-    end
-
-    if polygontype.eql? "planmap"
       zone_id = return_planmap_id
     else
+      polygontype = "zone"
       zone_id = params[:zoneid]
     end
+
+
     polygon.update(polygontype: polygontype, description: params[:description], zone_id: zone_id)
 
 
@@ -59,6 +65,9 @@ class PolygonsController < ApplicationController
 
     def return_planmap_id
       @zone = Zone.find_by(code: "planmap")
+      if @zone.nil?
+        @zone = Zone.create(code: "planmap", color_code: "#888888")
+      end
       return @zone.id
     end
 

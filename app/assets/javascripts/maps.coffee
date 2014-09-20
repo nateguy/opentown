@@ -559,7 +559,7 @@ $ ->
     content = header_tag + description_tag
 
     if $("body.plans.edit").length
-      content = content + form_zoneDropBox_tag + edit_form_tag + form_description_tag + form_polygontype_tag + form_paths_tag + form_planid_tag + form_id_tag + form_zoneid_tag + form_submit_tag + form_delete_tag
+      content = content + form_zoneDropBox_tag + edit_form_tag + form_description_tag + form_paths_tag + form_planid_tag + form_id_tag + form_zoneid_tag + form_submit_tag + form_delete_tag
     if $("body.user_polygons.show").length
       content = content + form_zoneDropBox_tag + userpolygon_form_tag + form_description_tag + form_zoneid_tag + form_polygonid_tag + form_submit_tag + "</div>"
     if $("body.plans.show").length
