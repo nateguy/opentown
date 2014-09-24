@@ -12,7 +12,7 @@ window.overlay = undefined
 window.img = ''
 rectangle = null
 control = null
-
+current_polygon = null
 
 $ ->
 
@@ -90,11 +90,6 @@ $ ->
     response.done (data) ->
       defaultLocation = new google.maps.LatLng(22.297256, 113.948430)
 
-
-
-
-      # latlng = new google.maps.LatLng(22.297256, 113.948430)
-
       mapOptions =
         center: defaultLocation
         zoom: 10
@@ -142,15 +137,19 @@ $ ->
 
   adminEditPolygon = (polygon) ->
     polygon.fillOpacity = 0.6
+
     google.maps.event.addListener(polygon, 'click', showZone)
-    google.maps.event.addListener(polygon, 'mouseover', ->
-      this.setEditable(true)
-
+    google.maps.event.addListener(polygon, 'rightclick', ->
+      if this.editable
+        this.setEditable(false)
+      else
+        this.setEditable(true)
       )
-    google.maps.event.addListener(polygon, 'mouseout', ->
-      this.setEditable(false)
 
-      )
+    # google.maps.event.addListener(polygon, 'mouseout', ->
+    #   this.setEditable(false)
+
+    #  )
     addDeleteButton(polygon, 'http://i.imgur.com/RUrKV.png')
 
 
