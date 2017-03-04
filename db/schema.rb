@@ -45,7 +45,7 @@ ActiveRecord::Schema.define(version: 20140915181453) do
     t.string   "type"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.binary   "content"
+    t.text     "content"
     t.string   "overlay_file_name"
     t.string   "overlay_content_type"
     t.integer  "overlay_file_size"
@@ -58,10 +58,10 @@ ActiveRecord::Schema.define(version: 20140915181453) do
 
   create_table "polygons", force: true do |t|
     t.integer  "plan_id"
+    t.integer  "zone_id"
     t.string   "polygontype"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "zone_id"
     t.string   "description"
   end
 
